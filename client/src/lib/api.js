@@ -7,7 +7,7 @@ function request(method, path, args) {
         }
    }};
 
-  const base = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'http://pull-app.dvk.co';
+  const base = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
 
   return window.fetch(base + path, args)
       .then(r => r.json())
