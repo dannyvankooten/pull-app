@@ -43,7 +43,7 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      count: 1,
+      count: localStorage.getItem('repetitions') || 1,
       buttonText: "Save",
       activities: [],
     };
@@ -63,6 +63,7 @@ class App extends React.Component {
 
   save(evt) {
     this.setState({buttonText: "Saving"});
+    localStorage.setItem('repetitions', this.state.count);
 
     post('/activities', {repetitions: this.state.count})
         .then((activity) => {
