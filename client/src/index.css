@@ -21,3 +21,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.build-info {
+  margin-top: 40px;
+  font-size: 0.7em;
+  text-align: center;
+  color: #BBB;
+}

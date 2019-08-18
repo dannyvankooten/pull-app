@@ -12,6 +12,8 @@ REMOTE="$REMOTE_USER@$REMOTE_HOST"
 DIR_DEPLOY="$SERVER_DIR"
 DIR_TEMP="/tmp/pull-app.dvk.co-$DATE"
 
+# Bump version in cache.manifest
+sed -i.bak "s/Version .*/Version $DATE/g"  client/public/cache.manifest
 
 # copy to local release directory
 echo "-- building application for production"
@@ -23,10 +25,7 @@ cd "$DIR_TEMP"
 cd client
 npm install
 NODE_ENV=production npm run build
-
-# build server deps
-cd ..
-npm install
+sed -i.bak "s/%DATE%/$DATE/g"  build/index.html 
 
 # deploy to server
 echo "-- deploying to $REMOTE_HOST"
@@ -37,6 +36,8 @@ rsync -qru "$DIR_TEMP/." "$REMOTE:$DIR_DEPLOY" --exclude="client/node_modules" -
 # prepare application & switch symlinks
 echo "-- finalising deployment"
 ssh -t "$REMOTE" "\
+	cd $DIR_DEPLOY \
+	npm install
   sudo systemctl restart pull-app
     "
 

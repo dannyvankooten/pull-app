@@ -6,6 +6,7 @@ sessions
 /node_modules
 
 # misc
+.bak
 .idea
 .DS_Store
 .env.local

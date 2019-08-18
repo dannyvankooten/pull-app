@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 const debug = process.env.NODE_ENV !== "production";
 const session = require('express-session')
 const SQLiteStore = require('connect-sqlite3')(session);
+const path = require('path');
 
 app.set("port", process.env.PORT || 3001);
 app.set('trust proxy', 1)

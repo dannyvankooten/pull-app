@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" manifest="cache.manifest">
   <head>
     <meta charset="utf-8" />
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no" />
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Pull-App - Grease the groove baby"
     />
     <link rel="apple-touch-icon" href="logo192.png" />
     <!--
@@ -39,5 +39,12 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <footer class="build-info">Last updated on %DATE%</footer>
+    <script>
+    function updateSite(event) {
+        window.location.reload(true);
+    }
+    window.applicationCache && window.applicationCache.addEventListener('updateready', updateSite, false);
+    </script>
   </body>
 </html>
