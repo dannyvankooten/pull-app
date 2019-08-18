@@ -8,6 +8,7 @@ SERVER_DIR="/var/www/pull-app.dvk.co"
 
 # Computed vars
 DATE=$(date +%Y%m%d%H%M)
+DATE_NICE=$(date '+%Y-%m-%d %H:%M')
 REMOTE="$REMOTE_USER@$REMOTE_HOST"
 DIR_DEPLOY="$SERVER_DIR"
 DIR_TEMP="/tmp/pull-app.dvk.co-$DATE"
@@ -25,7 +26,7 @@ cd "$DIR_TEMP"
 cd client
 npm install
 NODE_ENV=production npm run build
-sed -i.bak "s/%DATE%/$DATE/g"  build/index.html 
+sed -i.bak "s/%DATE%/$DATE_NICE/g"  build/index.html 
 
 # deploy to server
 echo "-- deploying to $REMOTE_HOST"
