@@ -1,16 +1,7 @@
-body {
-  color: #222;
-  font-size: 16px;
-}
-
 .app {
   text-align: center;
   vertical-align: middle;
   margin: 20px;
-}
-
-a {
-  color: #61dafb;
 }
 
 .menu a {
