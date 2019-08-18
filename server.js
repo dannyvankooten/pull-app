@@ -32,7 +32,7 @@ app.use(function(req, res, next) {
 })
 
 if (!debug) {
-    app.use(express.static("client/build"))
+    app.use(express.static(path.join(__dirname, 'client/build')))
 }
 
 const dbPromise = Promise.resolve()
@@ -90,6 +90,12 @@ app.post("/activities", async (req, res) => {
     const data = await db.get('SELECT * FROM activities WHERE id = ?', result.lastID)
     res.json(data)
 });
+
+if (!debug) {
+    app.get('*', (req,res) =>{
+        res.sendFile(path.join(__dirname+'/client/build/index.html'));
+    });
+}
 
 app.listen(app.get("port"), () => {
     console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console

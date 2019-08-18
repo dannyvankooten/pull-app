@@ -7,10 +7,6 @@
   margin-right: auto;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 .menu a {
   padding: 6px 12px;
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter as Router, Route, NavLink } from "react-router-dom";
+import { Router, Route, NavLink } from "react-router-dom";
 import Track from './components/Track.js';
 import Stats from './components/Stats.js';
 import Feed from './components/Feed.js';
@@ -33,7 +33,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="app">
-        <Router>
+        <Router history={history}>
           {this.state.user ? 
             <div className="menu">
               <NavLink exact to="/">Track</NavLink>
