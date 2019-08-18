@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import TimeAgo from 'timeago-react';
+import { BrowserRouter as Router, Route, NavLink } from "react-router-dom";
 
 function request(method, path, args) {
   args = {...args, ...{
@@ -38,7 +39,10 @@ function date(utcDatetimeString) {
   return d;
 }
 
-class App extends React.Component {
+function Stats() { return <h1>Stats</h1>  }
+function Feed() { return <h1>Feed</h1> }
+
+class Track extends React.Component {
   constructor(props) {
     super(props);
 
@@ -75,8 +79,7 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-    <div className="App">
+    return (<div>
       <div>
         <span className="control" onClick={(e) => {
           let count = Math.max(1, this.state.count - 1);
@@ -100,7 +103,28 @@ class App extends React.Component {
             </div>
         ))}
       </div>
-    </div>
+    </div>)
+  }
+}
+
+class App extends React.Component {
+  render() {
+    return (
+      <div className="app">
+        <Router>
+          <div className="menu">
+            <NavLink exact to="/">Track</NavLink>
+            <NavLink exact to="/feed">Feed</NavLink>
+            <NavLink exact to="/stats">Stats</NavLink>
+          </div>
+
+          <div>
+            <Route path="/" exact component={Track} />
+            <Route path="/feed" component={Feed} />
+            <Route path="/stats" component={Stats} />
+          </div>
+        </Router>
+      </div>
     )
   }
 }

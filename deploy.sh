@@ -37,7 +37,7 @@ rsync -qru "$DIR_TEMP/." "$REMOTE:$DIR_DEPLOY" --exclude="client/node_modules" -
 # prepare application & switch symlinks
 echo "-- finalising deployment"
 ssh -t "$REMOTE" "\
-  systemctl restart pull-app
+  sudo systemctl restart pull-app
     "
 
 
