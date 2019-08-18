@@ -24,12 +24,15 @@ class Feed extends React.Component {
 
   render() {
   	return (
-  		<div className="feed activity-list">
+  		<div className="feed">
+			<h1>Activity feed</h1>
+			<div className={"activity-list margin-s"}>
   			 {this.state.activities.map(a => (
-            <div key={`activity-${a.id}`}>
-              <strong>{a.username}</strong> did <strong>{a.repetitions}</strong> reps <span className="activity-ts"><TimeAgo datetime={a.date} /></span>
-            </div>
-        ))}
+				<div key={`activity-${a.id}`}>
+				  <strong>{a.username}</strong> did <strong>{a.repetitions}</strong> reps <span className="activity-ts"><TimeAgo datetime={a.date} /></span>
+				</div>
+        	))}
+			</div>
   		</div>
   	)
   }

@@ -6,9 +6,7 @@ function request(method, path, args) {
           'Accept': 'application/json',
         }
    }};
-
   const base = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
-
   return window.fetch(base + path, args)
       .then(r => r.json())
 }

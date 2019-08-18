@@ -1,15 +1,18 @@
 import React from 'react';
 import './Stats.css';
 import api from './../lib/api.js';
-const empty = { average: 0, total: 0, biggest: 0 }
-class Stats extends React.Component {
+import Chart from './Chart.js';
 
+const empty = { average: 0, total: 0, biggest: 0 };
+
+class Stats extends React.Component {
 	constructor(props) {
-		super(props)
+		super(props);
 		this.state = {
 			week: empty,
 			month: empty,
-			year: empty
+			year: empty,
+			perDay: [],
 		}
 	}
 
@@ -23,6 +26,8 @@ class Stats extends React.Component {
 	render() {
 		return (<div className="stats">
 			<h1>Stats</h1>
+
+			<Chart data={this.state.perDay} />
 
 			<table>
 				<tbody>

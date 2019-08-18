@@ -12,29 +12,35 @@ import api from './lib/api.js';
 const history = createBrowserHistory();
 
 class App extends React.Component {
-
   constructor(props) {
-    super(props)
-
+    super(props);
     this.state = {
       user: null
-    }
+    };
+    this.onLogin = this.onLogin.bind(this);
 
     api.get('/session')
       .then(user => {
-        this.setState({user})
+        this.setState({user});
 
         if (!user) {
-          history.push('/login')
-        }
+        	history.push('/login')
+        } else if(['/login', '/register'].indexOf(history.location.pathname) > -1) {
+        	history.push('/')
+		}
       })
+  }
+
+  onLogin(state) {
+  	this.setState(state);
+  	history.push('/');
   }
 
   render() {
     return (
       <div className="app">
         <Router history={history}>
-          {this.state.user ? 
+          {this.state.user ?
             <div className="menu">
               <NavLink exact to="/">Track</NavLink>
               <NavLink exact to="/feed">Feed</NavLink>
@@ -45,10 +51,10 @@ class App extends React.Component {
               <Route path="/" exact component={Track} />
               <Route path="/feed" component={Feed} />
               <Route path="/stats" component={Stats} />
-              <Route path="/login" render={props => <Login onSuccess={s => this.setState(s) } />} />
-              <Route path="/register" render={props => <Register onSuccess={s => this.setState(s) } />} />
-            </div> 
-          
+              <Route path="/login" render={props => <Login onSuccess={this.onLogin} />} />
+              <Route path="/register" render={props => <Register onSuccess={this.onLogin} />} />
+            </div>
+
         </Router>
       </div>
     )

@@ -3,12 +3,13 @@ import React from 'react';
 import { withRouter, NavLink } from "react-router-dom";
 import api from './../lib/api.js';
 
-class Login extends React.Component { 
+class Login extends React.Component {
 	constructor(props) {
-		super(props)
+		super(props);
 
-		this.submit = this.submit.bind(this)
-		this.state = {}
+		this.submit = this.submit.bind(this);
+		this.state = {};
+		console.log(props.history)
 	}
 
 	submit(evt) {
@@ -20,31 +21,30 @@ class Login extends React.Component {
 			password: form.password.value,
 		}).then(user => {
 			if (!user) {
-				this.setState({ error: 'Invalid credentials.'})
+				this.setState({ error: 'Invalid credentials.'});
 				return;
 			}
 
-			this.props.onSuccess({ 
+			this.props.onSuccess({
 				authenticated: true,
 				user: user
-			})
-			this.props.history.push('/') 
+			});
 		})
 	}
 
 	render() {
 	return (
 		<div>
-			<h1>Login</h1> 
+			<h1>Login</h1>
 			<form method="post" onSubmit={this.submit}>
 				<div className="margin-s">
-					<label>Username</label>
-					<input type="text" name="username"/>
+					<label htmlFor="login-username" >Username</label>
+					<input type="text" name="username" id="login-username" placeholder="Enter your username" required />
 				</div>
 
 				<div className="margin-s">
-					<label>Password</label>
-					<input type="password" name="password" />
+					<label htmlFor="login-password">Password</label>
+					<input type="password" name="password" id="login-password" placeholder="Enter your password"  required />
 				</div>
 
 				<div className="margin-s">

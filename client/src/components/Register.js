@@ -2,11 +2,10 @@ import React from 'react';
 import { withRouter, NavLink } from "react-router-dom";
 import api from './../lib/api.js';
 
-class Register extends React.Component { 
+class Register extends React.Component {
 	constructor(props) {
-		super(props)
-
-		this.submit = this.submit.bind(this)
+		super(props);
+		this.submit = this.submit.bind(this);
 		this.state = {}
 	}
 
@@ -15,7 +14,7 @@ class Register extends React.Component {
 		const form = evt.target;
 
 		if (form.password.value !== form.password_confirmation.value) {
-			this.setState({error: "Passwords do not match."})
+			this.setState({error: "Passwords do not match."});
 			return
 		}
 
@@ -25,32 +24,32 @@ class Register extends React.Component {
 			passwordConfirmation: form.password_confirmation.value,
 		}).then(user => {
 			if (!user) {
+				this.setState({error: "Whoops. Something went wrong."});
 				return;
 			}
 
-			this.props.onSuccess({authenticated: true, user: user})
-			this.props.history.push('/')
-		})
+			this.props.onSuccess({authenticated: true, user: user});
+		}).catch(err => this.setState({error: "Whoops. Something went wrong."}))
 	}
 
 	render() {
 	return (
 		<div>
-			<h1>Register</h1> 
+			<h1>Register</h1>
 			<form method="POST" onSubmit={this.submit}>
 				<div className="margin-s">
-					<label>Username</label>
-					<input type="text" name="username" required minLength="2" />
+					<label htmlFor="register-username">Username</label>
+					<input type="text" name="username" id={"register-username"} placeholder={"Enter your username"} required minLength="2" />
 				</div>
 
 				<div className="margin-s">
-					<label>Password</label>
-					<input type="password" name="password" required minLength="6" maxLength="72" />
+					<label htmlFor={"register-password"}>Password</label>
+					<input type="password" name="password" id={"register-password"} placeholder={"Enter your password"} required minLength="6" maxLength="72" />
 				</div>
 
 				<div className="margin-s">
-					<label>Repeat password</label>
-					<input type="password" name="password_confirmation" required minLength="6" maxLength="72" />
+					<label htmlFor={"register-password-confirmation"}>Repeat password</label>
+					<input type="password" name="password_confirmation" id={"register-password-confirmation"} placeholder={"Enter your password (again)"} required minLength="6" maxLength="72" />
 				</div>
 
 				<div className="margin-s">

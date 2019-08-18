@@ -16,12 +16,12 @@ class Track extends React.Component {
   }
 
   componentDidMount() {
-    api.get('/activities')
+    api.get('/activities?limit=10')
     .then((activities) => {
       activities = activities.map(a => {
-        a.date = api.date(a.timestamp)
+        a.date = api.date(a.timestamp);
         return a;
-      })
+      });
       this.setState({activities})
     })
   }
@@ -33,8 +33,8 @@ class Track extends React.Component {
     api.post('/activities', {
     	repetitions: this.state.count
     }).then((activity) => {
-    	activity.date = api.date(activity.timestamp)
-        
+    	activity.date = api.date(activity.timestamp);
+
         this.setState({
            activities: [activity, ...this.state.activities],
            buttonText: "Save"
@@ -48,7 +48,7 @@ class Track extends React.Component {
   		<table>
   			<tbody>
   			<tr>
-  				<td>	
+  				<td>
 		        <span className="control" onClick={(e) => {
 		          let count = Math.max(1, this.state.count - 1);
 		          this.setState({count})}
@@ -70,7 +70,7 @@ class Track extends React.Component {
 			<div>
         <button onClick={this.save} className="button">{this.state.buttonText}</button>
       </div>
-      <div className="activity-list">
+      <div className="activity-list margin-s">
         {this.state.activities.map(a => (
             <div key={`activity-${a.id}`}>
               <strong>you</strong> did <strong>{a.repetitions}</strong> reps <span className="activity-ts"><TimeAgo datetime={a.date} /></span>
