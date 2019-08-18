@@ -7,7 +7,7 @@ class Track extends React.Component {
     super(props);
 
     this.state = {
-      count: localStorage.getItem('repetitions') || 1,
+      count: parseInt(localStorage.getItem('repetitions')) || 1,
       buttonText: "Save",
       activities: [],
     };
@@ -39,8 +39,8 @@ class Track extends React.Component {
   }
 
   render() {
-    return (<div>
-      <div>
+    return (<div className="track">
+      <div className="track-count">
         <span className="control" onClick={(e) => {
           let count = Math.max(1, this.state.count - 1);
           this.setState({count})}

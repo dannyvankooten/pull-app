@@ -1,11 +1,22 @@
 .app {
-  text-align: center;
   vertical-align: middle;
-  margin: 20px;
+  width: 100%;
+  max-width: 640px;
+  padding: 20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 .menu a {
   padding: 6px 12px;
+}
+
+.menu a:first-child {
+  padding-left: 0;
 }
 
 .menu a.active {
@@ -27,7 +38,14 @@
   min-width: 80px;
 }
 
-button {
+input, button {
+  width: 100%;
+  display: inline-block;
+  padding: 6px;
+}
+
+button,
+input[type="submit"] {
   color: white;
   outline: none;
   border: 0;
@@ -35,6 +53,7 @@ button {
   display: inline-block;
   padding: 8px 24px;
   cursor: pointer;
+  width: 100%;
 }
 
 button:active,
@@ -49,6 +68,16 @@ button::-moz-focus-inner {
   border: 0;
 }
 
+label {
+  display: block;
+  margin-bottom: 3px;
+  text-align: left;
+}
+
+.track-count {
+  text-align: center;
+}
+
 .activity-list {
   margin-top: 40px;
   color: #999;
@@ -58,6 +87,12 @@ button::-moz-focus-inner {
   margin-top: 8px;
 }
 
-.activity-ts {
+.margin-s {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 
+.margin-m {
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
