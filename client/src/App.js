@@ -31,8 +31,10 @@ function post(path, data) {
 }
 
 function date(utcDatetimeString) {
+  utcDatetimeString = utcDatetimeString.replace(' ', 'T');
+  utcDatetimeString = utcDatetimeString + "Z";
   let d = new Date(utcDatetimeString);
-  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  //d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
   return d;
 }
 
@@ -51,6 +53,10 @@ class App extends React.Component {
 
   componentDidMount() {
     get('/activities').then((activities) => {
+      activities = activities.map(a => {
+        a.date = date(a.timestamp)
+        return a;
+      })
       this.setState({activities})
     })
   }
@@ -89,7 +95,7 @@ class App extends React.Component {
       <div className="activity-list">
         {this.state.activities.map(a => (
             <div key={`activity-${a.id}`}>
-              <strong>you</strong> did <strong>{a.repetitions}</strong> reps <span className="activity-ts"><TimeAgo datetime={date(a.timestamp)} /></span>
+              <strong>you</strong> did <strong>{a.repetitions}</strong> reps <span className="activity-ts"><TimeAgo datetime={a.date} /></span>
             </div>
         ))}
       </div>
