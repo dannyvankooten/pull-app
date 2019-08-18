@@ -1,5 +1,6 @@
+# data
 database.sqlite
-
+sessions
 
 # dependencies
 /node_modules

@@ -25,19 +25,6 @@
 
 }
 
-.control {
-  font-size: 2em;
-  color: #999;
-  cursor: pointer;
-}
-
-.count {
-  display: inline-block;
-  font-size: 5em;
-  padding: 20px;
-  min-width: 80px;
-}
-
 input, button {
   width: 100%;
   display: inline-block;
@@ -77,6 +64,25 @@ label {
 .track-count {
   text-align: center;
 }
+
+.track-count table {
+   margin-left: auto;
+  margin-right: auto;
+}
+
+.track-count .control {
+  font-size: 2em;
+  color: #999;
+  cursor: pointer;
+}
+
+.track-count .count {
+  display: inline-block;
+  font-size: 5em;
+  padding: 20px;
+  min-width: 100px;
+}
+
 
 .activity-list {
   margin-top: 40px;

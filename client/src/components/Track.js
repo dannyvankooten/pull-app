@@ -16,7 +16,8 @@ class Track extends React.Component {
   }
 
   componentDidMount() {
-    api.get('/activities').then((activities) => {
+    api.get('/activities')
+    .then((activities) => {
       activities = activities.map(a => {
         a.date = api.date(a.timestamp)
         return a;
@@ -29,33 +30,46 @@ class Track extends React.Component {
     this.setState({buttonText: "Saving"});
     localStorage.setItem('repetitions', this.state.count);
 
-    api.post('/activities', {repetitions: this.state.count})
-        .then((activity) => {
-          this.setState({
-            activities: [activity, ...this.state.activities],
-            buttonText: "Save"
-          })
+    api.post('/activities', {
+    	repetitions: this.state.count
+    }).then((activity) => {
+    	activity.date = api.date(activity.timestamp)
+        
+        this.setState({
+           activities: [activity, ...this.state.activities],
+           buttonText: "Save"
         })
+      })
   }
 
   render() {
     return (<div className="track">
-      <div className="track-count">
-        <span className="control" onClick={(e) => {
-          let count = Math.max(1, this.state.count - 1);
-          this.setState({count})}
-        }>-</span>
-        <span className="count">{this.state.count}</span>
-        <span className="control"  onMouseDown={(evt) => {
-          evt.preventDefault()
-          let count = this.state.count + 1;
-          this.setState({count})}
-        }>+</span>
+    	<div className="track-count">
+  		<table>
+  			<tbody>
+  			<tr>
+  				<td>	
+		        <span className="control" onClick={(e) => {
+		          let count = Math.max(1, this.state.count - 1);
+		          this.setState({count})}
+		        }>-</span>
+  				</td>
+  				<td>
+  					 <span className="count">{this.state.count}</span>
+  				</td>
+  				<td>
+  					<span className="control"  onMouseDown={(evt) => {
+			          let count = this.state.count + 1;
+			          this.setState({count})}
+			        }>+</span>
+  				</td>
+  			</tr>
+  			</tbody>
+  		</table>
       </div>
-      <div>
+			<div>
         <button onClick={this.save} className="button">{this.state.buttonText}</button>
       </div>
-
       <div className="activity-list">
         {this.state.activities.map(a => (
             <div key={`activity-${a.id}`}>

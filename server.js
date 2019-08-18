@@ -1,46 +1,92 @@
 const express = require("express");
 const sqlite = require('sqlite');
+const bcrypt = require('bcrypt')
 const Promise = require('bluebird');
 const app = express();
 const bodyParser = require('body-parser')
 const debug = process.env.NODE_ENV !== "production";
+const session = require('express-session')
+const SQLiteStore = require('connect-sqlite3')(session);
 
 app.set("port", process.env.PORT || 3001);
+app.set('trust proxy', 1)
 app.use(bodyParser.json())
+app.use(session({ 
+    store: new SQLiteStore,
+    secret: process.env.SESSION_SECRET || "de kat krabt de krullen van de trap", 
+    cookie: { 
+        maxAge: 3600000 * 24 * 90,
+        secure: false, //!debug TODO: setup HTTPS then uncomment this
+    },
+    resave: false,
+    saveUninitialized: true,
+}))
 app.use(function(req, res, next) {
     if(debug) {
-        res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-        res.header('Access-Control-Allow-Credentials', true);
+        res.header("Access-Control-Allow-Origin", "http://localhost:3000")
+        res.header('Access-Control-Allow-Credentials', true)
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     }
-    next();
-});
+
+    next()
+})
 
 if (!debug) {
-    app.use(express.static("client/build"));
+    app.use(express.static("client/build"))
 }
 
 const dbPromise = Promise.resolve()
     .then(() => sqlite.open('./database.sqlite', { Promise }))
     .then(db => db.migrate({
         force: debug ? 'last' : false,
-    }));
+    }))
 
-app.get("/users", async (req, res) => {
+app.get('/session', (req, res) => {
+    res.json(req.session.user || false)
+})    
+
+app.post('/login', async(req, res) => {
     const db = await dbPromise;
-    const data = await db.all('SELECT * FROM users');
-    res.json(data)
+    let user = await db.get('SELECT * FROM users WHERE username = ?', [req.body.username])
+    if (!user) {
+        return res.json(false)
+    } 
+
+    let passwordMatches = await bcrypt.compare(req.body.password, user.password)
+    if (!passwordMatches) {
+        return res.json(false)
+    }
+
+    delete user.password
+    req.session.user = user
+    res.json(user)
+});
+
+app.post('/register', async(req, res) => {
+    const db = await dbPromise;
+    let passwordHash = await bcrypt.hash(req.body.password, 10)
+    let result = await db.run('INSERT INTO users(username, password) VALUES(?, ?)', [req.body.username, passwordHash])
+    let user = await db.get('SELECT * FROM users WHERE id = ?', result.lastID)
+    delete user.password
+    req.session.user = user
+    res.json(user)
 });
 
 app.get("/activities", async (req, res) => {
-    const db = await dbPromise;
-    const data = await db.all('SELECT * FROM activities ORDER BY id DESC');
+    const db = await dbPromise
+
+    let data;
+    if (req.query.feed) {
+        data = await db.all('SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.id DESC', [])
+    } else {
+        data = await db.all('SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id WHERE user_id = ? ORDER BY a.id DESC', [ req.session.user.id ])
+    }
     res.json(data)
 });
 
 app.post("/activities", async (req, res) => {
     const db = await dbPromise;
-    const result = await db.run('INSERT INTO activities(user_id, repetitions) VALUES(?, ?)', [1, req.body.repetitions])
+    const result = await db.run('INSERT INTO activities(user_id, repetitions) VALUES(?, ?)', [req.session.user.id, req.body.repetitions])
     const data = await db.get('SELECT * FROM activities WHERE id = ?', result.lastID)
     res.json(data)
 });
