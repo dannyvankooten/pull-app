@@ -12,10 +12,10 @@ const path = require('path');
 app.set("port", process.env.PORT || 3001);
 app.set('trust proxy', 1)
 app.use(bodyParser.json())
-app.use(session({ 
+app.use(session({
     store: new SQLiteStore,
-    secret: process.env.SESSION_SECRET || "de kat krabt de krullen van de trap", 
-    cookie: { 
+    secret: process.env.SESSION_SECRET || "de kat krabt de krullen van de trap",
+    cookie: {
         maxAge: 3600000 * 24 * 90,
         secure: false, //!debug TODO: setup HTTPS then uncomment this
     },
@@ -44,14 +44,14 @@ const dbPromise = Promise.resolve()
 
 app.get('/session', (req, res) => {
     res.json(req.session.user || false)
-})    
+})
 
 app.post('/login', async(req, res) => {
     const db = await dbPromise;
     let user = await db.get('SELECT * FROM users WHERE username = ?', [req.body.username])
     if (!user) {
         return res.json(false)
-    } 
+    }
 
     let passwordMatches = await bcrypt.compare(req.body.password, user.password)
     if (!passwordMatches) {
@@ -90,6 +90,17 @@ app.post("/activities", async (req, res) => {
     const result = await db.run('INSERT INTO activities(user_id, repetitions) VALUES(?, ?)', [req.session.user.id, req.body.repetitions])
     const data = await db.get('SELECT * FROM activities WHERE id = ?', result.lastID)
     res.json(data)
+});
+
+app.get('/stats', async (req, res) => {
+	const db = await dbPromise;
+	let week = await db.get('SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest FROM activities a WHERE timestamp > date("now", "-7 days") AND a.user_id = ?', req.session.user.id)
+	let month = await db.get('SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest FROM activities a WHERE timestamp > date("now", "-30 days") AND a.user_id = ?', req.session.user.id)
+	let year = await db.get('SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest FROM activities a WHERE timestamp > date("now", "-365 days") AND a.user_id = ?', req.session.user.id)
+
+	res.json({
+		week, month, year
+	})
 });
 
 if (!debug) {
