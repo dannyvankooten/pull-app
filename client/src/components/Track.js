@@ -11,8 +11,9 @@ class Track extends React.Component {
       buttonText: "Save",
       activities: [],
     };
-
-    this.save = this.save.bind(this)
+    this.save = this.save.bind(this);
+    this.confirmDeletion = this.confirmDeletion.bind(this);
+    this.cancelDeletion = this.cancelDeletion.bind(this);
   }
 
   componentDidMount() {
@@ -24,6 +25,26 @@ class Track extends React.Component {
       });
       this.setState({activities})
     })
+  }
+
+  confirmDeletion (activity) {
+      this.buttonPressTimer = setTimeout(() => {
+          if (!window.confirm("Delete this activity?")) {
+              return;
+          }
+
+          api.del(`/activities/${activity.id}`)
+              .then(r => {
+                  let index = this.state.activities.indexOf(activity);
+                  let activities = this.state.activities;
+                  activities.splice(index, 1);
+                  this.setState({activities})
+              });
+        }, 1200);
+  }
+
+    cancelDeletion () {
+      clearTimeout(this.buttonPressTimer);
   }
 
   save(evt) {
@@ -72,8 +93,13 @@ class Track extends React.Component {
       </div>
       <div className="activity-list margin-s">
         {this.state.activities.map(a => (
-            <div key={`activity-${a.id}`}>
-              <strong>you</strong> did <strong>{a.repetitions}</strong> reps <span className="activity-ts"><TimeAgo datetime={a.date} /></span>
+            <div key={`activity-${a.id}`} data-id={a.id}
+                 onTouchStart={() => this.confirmDeletion(a)}
+                 onTouchEnd={this.cancelDeletion}
+                 onMouseDown={() => this.confirmDeletion(a)}
+                 onMouseUp={this.cancelDeletion}
+                 onMouseLeave={this.cancelDeletion}>
+                <strong>you</strong> did <strong>{a.repetitions}</strong> reps <span className="activity-ts"><TimeAgo datetime={a.date} /></span>
             </div>
         ))}
       </div>

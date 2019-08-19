@@ -34,6 +34,7 @@ const dbPromise = Promise.resolve()
 
 app.use(function(req, res, next) {
     if(debug) {
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
         res.header("Access-Control-Allow-Origin", "http://localhost:3000");
         res.header('Access-Control-Allow-Credentials', true);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -46,11 +47,11 @@ if (!debug) {
     app.use(express.static(path.join(__dirname, 'client/build')))
 }
 
-app.get('/session', (req, res) => {
+app.get('/api/session', (req, res) => {
     res.json(req.session.user || false)
 });
 
-app.post('/login', catcher(async(req, res) => {
+app.post('/api/login', catcher(async(req, res) => {
     const db = await dbPromise;
     let user = await db.get('SELECT * FROM users WHERE username = ?', [req.body.username]);
     if (!user) {
@@ -67,7 +68,7 @@ app.post('/login', catcher(async(req, res) => {
     res.json(user)
 }));
 
-app.post('/register', catcher(async(req, res) => {
+app.post('/api/register', catcher(async(req, res) => {
     const db = await dbPromise;
     let passwordHash = await bcrypt.hash(req.body.password, 10);
     let result = await db.run('INSERT INTO users(username, password) VALUES(?, ?)', [req.body.username, passwordHash]);
@@ -77,7 +78,7 @@ app.post('/register', catcher(async(req, res) => {
     res.json(user)
 }));
 
-app.get("/activities", catcher(async (req, res) => {
+app.get("/api/activities", catcher(async (req, res) => {
     const db = await dbPromise;
     let data;
     if (req.query.feed) {
@@ -88,14 +89,22 @@ app.get("/activities", catcher(async (req, res) => {
     res.json(data)
 }));
 
-app.post("/activities", catcher(async (req, res) => {
+app.post("/api/activities", catcher(async (req, res) => {
+    console.log("Saving", req.body.repetitions, "for", req.session.user.id);
     const db = await dbPromise;
     const result = await db.run('INSERT INTO activities(user_id, repetitions) VALUES(?, ?)', [req.session.user.id, req.body.repetitions]);
     const data = await db.get('SELECT * FROM activities WHERE id = ?', result.lastID);
     res.json(data)
 }));
 
-app.get('/stats', catcher(async (req, res) => {
+app.delete("/api/activities/:id", catcher(async (req, res) => {
+    console.log("Deleting", req.params.id);
+    const db = await dbPromise;
+    await db.run('DELETE FROM activities WHERE user_id = ? AND id = ?', [req.session.user.id, req.params.id]);
+    res.json(true)
+}));
+
+app.get('/api/stats', catcher(async (req, res) => {
 	const createSql = (dateModifier) => `SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest FROM activities a WHERE timestamp > date("now", "${dateModifier}") AND a.user_id = ?`;
 	const db = await dbPromise;
 	let week = await db.get(createSql('-7 days'), req.session.user.id);

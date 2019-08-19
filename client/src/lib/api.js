@@ -1,12 +1,12 @@
 function request(method, path, args) {
   args = {...args, ...{
       method: method,
-      credentials: 'include',
+      credentials: 'include', mode: 'cors',
       headers: {...args.headers || {}}, ...{
           'Accept': 'application/json',
         }
    }};
-  const base = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+  const base = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : '/api';
   return window.fetch(base + path, args)
       .then(r => r.json())
 }
@@ -18,10 +18,14 @@ function get(path) {
 function post(path, data) {
   return request('POST', path, {
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json; charset=UTF-8'
     },
     body: JSON.stringify(data)
   })
+}
+
+function del(path) {
+    return request('DELETE', path, {});
 }
 
 function date(utcDatetimeString) {
@@ -31,4 +35,4 @@ function date(utcDatetimeString) {
   return d;
 }
 
-export default { get, post, date }
+export default { get, post, del, date }

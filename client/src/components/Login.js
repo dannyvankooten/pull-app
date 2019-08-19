@@ -6,10 +6,8 @@ import api from './../lib/api.js';
 class Login extends React.Component {
 	constructor(props) {
 		super(props);
-
 		this.submit = this.submit.bind(this);
 		this.state = {};
-		console.log(props.history)
 	}
 
 	submit(evt) {
