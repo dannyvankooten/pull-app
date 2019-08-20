@@ -20,15 +20,16 @@ class App extends React.Component {
     this.onLogin = this.onLogin.bind(this);
 
     api.get('/session')
-      .then(user => {
-        this.setState({user});
+        .then(user => {
+            this.setState({user});
 
-        if (!user) {
-        	history.push('/login')
-        } else if(['/login', '/register'].indexOf(history.location.pathname) > -1) {
-        	history.push('/')
-		}
-      })
+            if (!user) {
+                history.push('/login')
+            } else if (['/login', '/register'].indexOf(history.location.pathname) > -1) {
+                history.push('/')
+            }
+        }).catch(err => history.push('/login'))
+
   }
 
   onLogin(state) {

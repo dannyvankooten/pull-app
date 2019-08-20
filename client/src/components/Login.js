@@ -27,7 +27,7 @@ class Login extends React.Component {
 				authenticated: true,
 				user: user
 			});
-		})
+		}).catch(err => this.setState({error: "Network error. Please try again later."}))
 	}
 
 	render() {
