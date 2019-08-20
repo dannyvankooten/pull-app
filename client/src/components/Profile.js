@@ -1,11 +1,11 @@
 import React from 'react';
-import './Stats.css';
+import './Profile.css';
 import api from './../lib/api.js';
 import Chart from './Chart.js';
 
 const empty = { average: 0, total: 0, biggest: 0 };
 
-class Stats extends React.Component {
+class Profile extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -13,19 +13,21 @@ class Stats extends React.Component {
 			month: empty,
 			year: empty,
 			perDay: [],
+			user: {}
 		}
 	}
 
 	componentDidMount() {
-		api.get('/stats')
-			.then(data => {
-				this.setState(data)
-			})
+		api.get(`/users/${this.props.match.params.id}`)
+			.then(this.setState.bind(this));
+
+		api.get(`/stats/${this.props.match.params.id}`)
+			.then(this.setState.bind(this))
 	}
 
 	render() {
 		return (<div className="stats">
-			<h1>Stats</h1>
+			<h1>Stats <small>for {this.state.user.username}</small></h1>
 
 			<Chart data={this.state.perDay} />
 
@@ -86,4 +88,4 @@ class Stats extends React.Component {
 	}
 }
 
-export default Stats
+export default Profile

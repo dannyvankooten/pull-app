@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { Router, Route, NavLink } from "react-router-dom";
 import Track from './components/Track.js';
-import Stats from './components/Stats.js';
+import Profile from './components/Profile.js';
 import Feed from './components/Feed.js';
 import Login from './components/Login.js';
 import Register from './components/Register.js';
@@ -29,7 +29,6 @@ class App extends React.Component {
                 history.push('/')
             }
         }).catch(err => history.push('/login'))
-
   }
 
   onLogin(state) {
@@ -42,19 +41,28 @@ class App extends React.Component {
       <div className="app">
         <Router history={history}>
           {this.state.user ?
-            <div className="menu">
-              <NavLink exact to="/">Track</NavLink>
-              <NavLink exact to="/feed">Feed</NavLink>
-              <NavLink exact to="/stats">Stats</NavLink>
-            </div> : ''}
+                  <div>
+                      <div className="menu">
+                        <NavLink exact to="/">Track</NavLink>
+                        <NavLink exact to="/feed">Feed</NavLink>
+                        <NavLink exact to={`/athlete/${this.state.user.id}`}>Profile</NavLink>
+                      </div>
 
-            <div>
-              <Route path="/" exact component={Track} />
-              <Route path="/feed" component={Feed} />
-              <Route path="/stats" component={Stats} />
-              <Route path="/login" render={props => <Login onSuccess={this.onLogin} />} />
-              <Route path="/register" render={props => <Register onSuccess={this.onLogin} />} />
-            </div>
+                    <div>
+                      <Route path="/" exact component={Track} />
+                      <Route path="/feed" component={Feed} />
+                      <Route path="/athlete/:id" component={Profile} />
+                      <Route path="/login" render={props => <Login onSuccess={this.onLogin} />} />
+                      <Route path="/register" render={props => <Register onSuccess={this.onLogin} />} />
+                    </div>
+                  </div>
+              :
+
+              <div>
+                <Route path="/login" render={props => <Login onSuccess={this.onLogin} />} />
+                <Route path="/register" render={props => <Register onSuccess={this.onLogin} />} />
+              </div>
+          }
 
         </Router>
       </div>

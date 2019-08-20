@@ -17,16 +17,16 @@ class Chart extends React.Component {
 		let max = 0;
 		let bars = [];
 
-		let weekStart = new Date();
-		weekStart.setDate(now.getDate() - 90);
-		weekStart.setDate(weekStart.getDate() + (0-weekStart.getDay())); // set to Sunday
-		while(weekStart <= now) {
+		for(let i = 12; i >= 0; i--) {
+			let weekStart = new Date();
+			weekStart.setDate(now.getDate() - (i*7));
+			weekStart.setDate(weekStart.getDate() + (0 - weekStart.getDay())); // set to Sunday
 			let weekEnd = new Date(weekStart);
 			weekEnd.setDate(weekStart.getDate() + 7);
 			let total = 0;
 
 			data.forEach(d => {
-				if (d.date >= weekStart && d.date < weekEnd) {
+				if (d.date > weekStart && d.date <= weekEnd) {
 					total += d.total
 				}
 			});
@@ -41,7 +41,7 @@ class Chart extends React.Component {
 		max = Math.ceil(max / 10) * 10;
 		max = Math.max(10, max);
 		return (
-			<div className={"chart"}>
+			<div className={"chart margin-s"}>
 				<div className="y-axis">
 					<div style={{bottom: '100%'}}>{max}</div>
 					<div style={{bottom: '50%'}}>{max/2}</div>
@@ -54,7 +54,7 @@ class Chart extends React.Component {
 							width: (100 / bars.length) + '%'
 						}}>
 							<div className={"bar"}  style={{
-								height: parseInt(b.y / max * 100) + '%',
+								height: (b.y / max * 100) + '%',
 							}}>
 								<span>{b.y}</span>
 							</div>

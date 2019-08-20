@@ -99,7 +99,7 @@ class Track extends React.Component {
                  onMouseDown={() => this.confirmDeletion(a)}
                  onMouseUp={this.cancelDeletion}
                  onMouseLeave={this.cancelDeletion}>
-                <strong>you</strong> did <strong>{a.repetitions}</strong> reps <span className="activity-ts"><TimeAgo datetime={a.date} /></span>
+                <strong>you</strong> did <strong>{a.repetitions}</strong> reps <span className="activity-ts"> &middot; <TimeAgo datetime={a.date} /></span>
             </div>
         ))}
       </div>

@@ -26,6 +26,13 @@ h1, h2, h3 {
 	margin: 0;
 }
 
+h1 small,
+h2 small,
+h3 small {
+  color: #AAA;
+  font-size: 0.5em;
+}
+
 input, button {
   width: 100%;
   display: inline-block;
@@ -86,13 +93,6 @@ label {
 
 .notice-warning { color: red; }
 
-.activity-list {
-  color: #999;
-  font-size: 0.8em;
-}
-.activity-list > div {
-  margin-top: 8px;
-}
 
 .margin-s {
   margin-top: 20px;
@@ -103,3 +103,25 @@ label {
   margin-top: 40px;
   margin-bottom: 40px;
 }
+
+
+.activity-list {
+  color: #999;
+  font-size: 0.8em;
+}
+
+.activity-list a {
+  color: #242428;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.activity-list strong {
+  color: #242428;
+  font-weight: 500;
+}
+
+.activity-list > div {
+  margin-top: 8px;
+}
+

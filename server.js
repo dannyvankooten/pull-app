@@ -78,6 +78,12 @@ app.post('/api/register', catcher(async(req, res) => {
     res.json(user)
 }));
 
+app.get("/api/users/:id", catcher(async (req, res) => {
+    const db = await dbPromise;
+    let data = await db.get('SELECT u.id, u.username, u.created_at, u.updated_at FROM users u WHERE u.id = ?', [ req.params.id ]);
+    res.json({ user: data });
+}));
+
 app.get("/api/activities", catcher(async (req, res) => {
     const db = await dbPromise;
     let data;
@@ -86,11 +92,10 @@ app.get("/api/activities", catcher(async (req, res) => {
     } else {
         data = await db.all('SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id WHERE user_id = ? ORDER BY a.id DESC', [ req.session.user.id ])
     }
-    res.json(data)
+    res.json(data.splice(0, req.query.limit || data.length))
 }));
 
 app.post("/api/activities", catcher(async (req, res) => {
-    console.log("Saving", req.body.repetitions, "for", req.session.user.id);
     const db = await dbPromise;
     const result = await db.run('INSERT INTO activities(user_id, repetitions) VALUES(?, ?)', [req.session.user.id, req.body.repetitions]);
     const data = await db.get('SELECT * FROM activities WHERE id = ?', result.lastID);
@@ -98,19 +103,18 @@ app.post("/api/activities", catcher(async (req, res) => {
 }));
 
 app.delete("/api/activities/:id", catcher(async (req, res) => {
-    console.log("Deleting", req.params.id);
     const db = await dbPromise;
     await db.run('DELETE FROM activities WHERE user_id = ? AND id = ?', [req.session.user.id, req.params.id]);
     res.json(true)
 }));
 
-app.get('/api/stats', catcher(async (req, res) => {
+app.get('/api/stats/:id', catcher(async (req, res) => {
 	const createSql = (dateModifier) => `SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest FROM activities a WHERE timestamp > date("now", "${dateModifier}") AND a.user_id = ?`;
 	const db = await dbPromise;
-	let week = await db.get(createSql('-7 days'), req.session.user.id);
-	let month = await db.get(createSql('-30 days'), req.session.user.id);
-	let year = await db.get(createSql('-365 days'), req.session.user.id);
-	let perDay = await db.all('SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest, date(a.timestamp) AS `date` FROM activities a WHERE timestamp > date("now", "-365 days") AND a.user_id = ? GROUP by date(a.timestamp)', req.session.user.id)
+	let week = await db.get(createSql('-7 days'), req.params.id);
+	let month = await db.get(createSql('-30 days'), req.params.id);
+	let year = await db.get(createSql('-365 days'), req.params.id);
+	let perDay = await db.all('SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest, date(a.timestamp) AS `date` FROM activities a WHERE timestamp > date("now", "-365 days") AND a.user_id = ? GROUP by date(a.timestamp)', req.params.id)
 	res.json({week, month, year, perDay})
 }));
 
