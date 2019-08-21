@@ -19,10 +19,10 @@ class Profile extends React.Component {
 
 	componentDidMount() {
 		api.get(`/users/${this.props.match.params.id}`)
-			.then(this.setState.bind(this));
+			.then(d => this.setState(d));
 
 		api.get(`/stats/${this.props.match.params.id}`)
-			.then(this.setState.bind(this))
+			.then(d => this.setState(d))
 	}
 
 	render() {

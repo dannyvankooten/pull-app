@@ -25,8 +25,8 @@ class Register extends React.Component {
 			password: form.password.value,
 			passwordConfirmation: form.password_confirmation.value,
 		}).then(user => {
-			if (!user) {
-				this.setState({error: "Whoops. Something went wrong."});
+			if (!user || user.error) {
+				this.setState({error: user.error || "Whoops. Something went wrong."});
 				return;
 			}
 

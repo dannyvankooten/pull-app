@@ -70,6 +70,11 @@ app.post('/api/login', catcher(async(req, res) => {
 
 app.post('/api/register', catcher(async(req, res) => {
     const db = await dbPromise;
+    let exists = await db.get('SELECT * FROM users WHERE username = ?', req.body.username.toLowerCase());
+    if (exists) {
+        return res.json({ error: "That username is taken, sorry."})
+    }
+
     let passwordHash = await bcrypt.hash(req.body.password, 10);
     let result = await db.run('INSERT INTO users(username, password) VALUES(?, ?)', [req.body.username, passwordHash]);
     let user = await db.get('SELECT * FROM users WHERE id = ?', result.lastID);

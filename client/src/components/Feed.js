@@ -14,7 +14,7 @@ class Feed extends React.Component {
   }
 
   componentDidMount() {
-  	api.get('/activities?feed=1')
+  	api.get('/activities?feed=1&limit=100')
     .then((activities) => {
       activities = activities.map(a => {
         a.date = api.date(a.timestamp);
