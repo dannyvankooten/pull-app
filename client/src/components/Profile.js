@@ -27,7 +27,7 @@ class Profile extends React.Component {
 
 	render() {
 		return (<div className="stats">
-			<h1>Stats <small>for {this.state.user.username}</small></h1>
+			<h1>{this.state.user.username}</h1>
 
 			<Chart data={this.state.perDay} />
 

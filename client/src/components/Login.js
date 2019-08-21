@@ -1,6 +1,6 @@
 import React from 'react';
-
 import { withRouter, NavLink } from "react-router-dom";
+import { Form } from 'semantic-ui-react'
 import api from './../lib/api.js';
 
 class Login extends React.Component {
@@ -34,23 +34,12 @@ class Login extends React.Component {
 	return (
 		<div>
 			<h1>Login</h1>
-			<form method="post" onSubmit={this.submit}>
-				<div className="margin-s">
-					<label htmlFor="login-username" >Username</label>
-					<input type="text" name="username" id="login-username" placeholder="Enter your username" required />
-				</div>
-
-				<div className="margin-s">
-					<label htmlFor="login-password">Password</label>
-					<input type="password" name="password" id="login-password" placeholder="Enter your password"  required />
-				</div>
-
-				<div className="margin-s">
-					<button type="submit">Login</button>
-				</div>
-
+			<Form onSubmit={this.submit}>
+				<Form.Input name={"username"} fluid type="text" label='Username' placeholder='Enter your username' htmlFor="login-username" id={"login-username"} required />
+				<Form.Input name={"password"} fluid type="password" label='Password' placeholder='Enter your password' htmlFor="login-password" id={"login-password"}  required />
+				<Form.Button>Log in</Form.Button>
 				{this.state.error ? <div className="notice notice-warning">{this.state.error}</div> : ''}
-			</form>
+			</Form>
 
 			<div className="margin-s">
 				<p>No account? <NavLink to="/register">Register here</NavLink>.</p>

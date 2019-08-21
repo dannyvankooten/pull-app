@@ -1,5 +1,6 @@
 import React from 'react';
 import TimeAgo from 'timeago-react';
+import {Button, Divider, Feed} from 'semantic-ui-react'
 import api from './../lib/api.js';
 
 class Track extends React.Component {
@@ -8,7 +9,7 @@ class Track extends React.Component {
 
     this.state = {
       count: parseInt(localStorage.getItem('repetitions')) || 1,
-      buttonText: "Save",
+      isLoading: false,
       activities: [],
     };
     this.save = this.save.bind(this);
@@ -48,7 +49,7 @@ class Track extends React.Component {
   }
 
   save(evt) {
-    this.setState({buttonText: "Saving"});
+    this.setState({isLoading: true});
     localStorage.setItem('repetitions', this.state.count);
 
     api.post('/activities', {
@@ -58,51 +59,59 @@ class Track extends React.Component {
 
         this.setState({
            activities: [activity, ...this.state.activities],
-           buttonText: "Save"
+           isLoading: false,
         })
       })
   }
 
   render() {
     return (<div className="track">
-    	<div className="track-count">
-  		<table>
-  			<tbody>
-  			<tr>
-  				<td>
-		        <span className="control" onClick={(e) => {
-		          let count = Math.max(1, this.state.count - 1);
-		          this.setState({count})}
-		        }>-</span>
-  				</td>
-  				<td>
-  					 <span className="count">{this.state.count}</span>
-  				</td>
-  				<td>
-  					<span className="control"  onMouseDown={(evt) => {
-			          let count = this.state.count + 1;
-			          this.setState({count})}
-			        }>+</span>
-  				</td>
-  			</tr>
-  			</tbody>
-  		</table>
-      </div>
-			<div>
-        <button onClick={this.save} className="button">{this.state.buttonText}</button>
-      </div>
-      <div className="activity-list margin-s">
-        {this.state.activities.map(a => (
-            <div key={`activity-${a.id}`} data-id={a.id}
-                 onTouchStart={() => this.confirmDeletion(a)}
-                 onTouchEnd={this.cancelDeletion}
-                 onMouseDown={() => this.confirmDeletion(a)}
-                 onMouseUp={this.cancelDeletion}
-                 onMouseLeave={this.cancelDeletion}>
-                <strong>you</strong> did <strong>{a.repetitions}</strong> reps <span className="activity-ts"> &middot; <TimeAgo datetime={a.date} /></span>
-            </div>
-        ))}
-      </div>
+        <div className={"margin-m"} >
+            <div className="track-count">
+            <table className={"margin-s"}>
+                <tbody>
+                <tr>
+                    <td>
+                    <span className="control" onClick={(e) => {
+                      let count = Math.max(1, this.state.count - 1);
+                      this.setState({count})}
+                    }>-</span>
+                    </td>
+                    <td>
+                         <span className="count">{this.state.count}</span>
+                    </td>
+                    <td>
+                        <span className="control"  onMouseDown={(evt) => {
+                          let count = this.state.count + 1;
+                          this.setState({count})}
+                        }>+</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+          </div>
+          <div>
+              <Button fluid size='big' onClick={this.save} loading={this.state.isLoading} primary>Save</Button>
+          </div>
+       </div>
+       <Divider horizontal>History</Divider>
+        <Feed>
+            {this.state.activities.map(a => (
+                    <Feed.Event onTouchStart={() => this.confirmDeletion(a)}
+                                onTouchEnd={this.cancelDeletion}
+                                onMouseDown={() => this.confirmDeletion(a)}
+                                onMouseUp={this.cancelDeletion}
+                                onMouseLeave={this.cancelDeletion}
+                                key={`activity-${a.id}`}>
+                        <Feed.Content>
+                            <Feed.Summary>
+                                You did <strong>{a.repetitions}</strong> reps
+                                <Feed.Date><TimeAgo datetime={a.date} /></Feed.Date>
+                            </Feed.Summary>
+                        </Feed.Content>
+                    </Feed.Event>
+            ))}
+        </Feed>
     </div>)
   }
 }

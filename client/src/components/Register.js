@@ -1,5 +1,7 @@
 import React from 'react';
 import { withRouter, NavLink } from "react-router-dom";
+import { Form } from 'semantic-ui-react'
+
 import api from './../lib/api.js';
 
 class Register extends React.Component {
@@ -36,28 +38,13 @@ class Register extends React.Component {
 	return (
 		<div>
 			<h1>Register</h1>
-			<form method="POST" onSubmit={this.submit}>
-				<div className="margin-s">
-					<label htmlFor="register-username">Username</label>
-					<input type="text" name="username" id={"register-username"} placeholder={"Enter your username"} required minLength="2" />
-				</div>
-
-				<div className="margin-s">
-					<label htmlFor={"register-password"}>Password</label>
-					<input type="password" name="password" id={"register-password"} placeholder={"Enter your password"} required minLength="6" maxLength="72" />
-				</div>
-
-				<div className="margin-s">
-					<label htmlFor={"register-password-confirmation"}>Repeat password</label>
-					<input type="password" name="password_confirmation" id={"register-password-confirmation"} placeholder={"Enter your password (again)"} required minLength="6" maxLength="72" />
-				</div>
-
-				<div className="margin-s">
-					<button type="submit">Register</button>
-				</div>
-
+			<Form onSubmit={this.submit}>
+				<Form.Input name={"username"} fluid type="text" label='Username' placeholder='Enter your username' required minLength="2" htmlFor="register-username" id={"register-username"} />
+				<Form.Input name={"password"} fluid type="password" label='Password' placeholder='Enter your password' required minLength="6" maxLength="72" htmlFor={"register-password"} id={"register-password"} />
+				<Form.Input name={"password_confirmation"} fluid type="password" label='Confirm password' placeholder='Enter your password (again)' required htmlFor={"register-password-confirmation"} id={"register-password-confirmation"} />
+				<Form.Button>Register</Form.Button>
 				{this.state.error ? <div className="notice notice-warning">{this.state.error}</div> : ''}
-			</form>
+			</Form>
 
 			<div className="margin-s">
 				<p>Already registered? <NavLink to="/login">Login here</NavLink>.</p>

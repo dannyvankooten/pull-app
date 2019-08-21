@@ -8,6 +8,7 @@ import Login from './components/Login.js';
 import Register from './components/Register.js';
 import { createBrowserHistory } from "history";
 import api from './lib/api.js';
+import { Menu } from 'semantic-ui-react'
 
 const history = createBrowserHistory();
 
@@ -42,13 +43,21 @@ class App extends React.Component {
         <Router history={history}>
           {this.state.user ?
                   <div>
-                      <div className="menu">
-                        <NavLink exact to="/">Track</NavLink>
-                        <NavLink exact to="/feed">Feed</NavLink>
-                        <NavLink exact to={`/athlete/${this.state.user.id}`}>Profile</NavLink>
-                      </div>
+                      <Menu fluid>
+                          <Menu.Item as={NavLink} exact to="/">
+                              Record
+                          </Menu.Item>
 
-                    <div>
+                          <Menu.Item as={NavLink} exact to="/feed" >
+                              Feed
+                          </Menu.Item>
+
+                          <Menu.Item as={NavLink} exact to={`/athlete/${this.state.user.id}`}>
+                              Profile
+                          </Menu.Item>
+                      </Menu>
+
+                    <div className={"margin-s"}>
                       <Route path="/" exact component={Track} />
                       <Route path="/feed" component={Feed} />
                       <Route path="/athlete/:id" component={Profile} />

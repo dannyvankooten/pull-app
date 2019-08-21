@@ -2,71 +2,9 @@
   vertical-align: middle;
   width: 100%;
   max-width: 580px;
-  padding: 20px;
+  padding: 10px 20px;
   margin-left: auto;
   margin-right: auto;
-}
-.menu {margin-bottom: 20px;}
-
-.menu a {
-  padding: 6px 12px;
-}
-
-.menu a:first-child {
-  padding-left: 0;
-}
-
-.menu a.active {
-  color: #333;
-    text-decoration: none;
-
-}
-
-h1, h2, h3 {
-	margin: 0;
-}
-
-h1 small,
-h2 small,
-h3 small {
-  color: #AAA;
-  font-size: 0.5em;
-}
-
-input, button {
-  width: 100%;
-  display: inline-block;
-  padding: 6px;
-}
-
-button,
-input[type="submit"] {
-  color: white;
-  outline: none;
-  border: 0;
-  background: #333;
-  display: inline-block;
-  padding: 8px 24px;
-  cursor: pointer;
-  width: 100%;
-}
-
-button:active,
-button:hover,
-button:focus {
-  outline: none;
-  background: #666;
-}
-
-input::-moz-focus-inner,
-button::-moz-focus-inner {
-  border: 0;
-}
-
-label {
-  display: block;
-  margin-bottom: 3px;
-  text-align: left;
 }
 
 .track-count {
@@ -93,7 +31,6 @@ label {
 
 .notice-warning { color: red; }
 
-
 .margin-s {
   margin-top: 20px;
   margin-bottom: 20px;
@@ -102,26 +39,5 @@ label {
 .margin-m {
   margin-top: 40px;
   margin-bottom: 40px;
-}
-
-
-.activity-list {
-  color: #999;
-  font-size: 0.8em;
-}
-
-.activity-list a {
-  color: #242428;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.activity-list strong {
-  color: #242428;
-  font-weight: 500;
-}
-
-.activity-list > div {
-  margin-top: 8px;
 }
 
