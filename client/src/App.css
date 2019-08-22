@@ -1,10 +1,13 @@
-.app {
-  vertical-align: middle;
+.container {
   width: 100%;
   max-width: 580px;
-  padding: 10px 20px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.main {
+  vertical-align: middle;
+  padding: 0 16px;
 }
 
 .track-count {
@@ -47,3 +50,10 @@
 }
 
 .muted { color: #AAA; }
+
+.build-info {
+  margin: 40px auto 20px auto;
+  font-size: 0.8em;
+  text-align: center;
+  color: #BBB;
+}

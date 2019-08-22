@@ -2,7 +2,7 @@ import React from 'react';
 import './Profile.css';
 import api from './../lib/api.js';
 import Chart from './Chart.js';
-
+import { Menu, Grid } from 'semantic-ui-react'
 const empty = { average: 0, total: 0, biggest: 0 };
 
 class Profile extends React.Component {
@@ -13,7 +13,8 @@ class Profile extends React.Component {
 			month: empty,
 			year: empty,
 			perDay: [],
-			user: {}
+			user: {},
+			chartGroupBy: 'week',
 		}
 	}
 
@@ -29,7 +30,13 @@ class Profile extends React.Component {
 		return (<div className="stats">
 			<h1>{this.state.user.username}</h1>
 
-			<Chart data={this.state.perDay} />
+			<Chart data={this.state.perDay} per={this.state.chartGroupBy} />
+			<div style={{textAlign: 'center'}}>
+				<Menu compact size={'mini'} >
+					<Menu.Item onClick={evt => this.setState({chartGroupBy: 'day'})} active={this.state.chartGroupBy === 'day'}>daily</Menu.Item>
+					<Menu.Item onClick={evt => this.setState({chartGroupBy: 'week'})}  active={this.state.chartGroupBy === 'week'}>weekly</Menu.Item>
+				</Menu>
+			</div>
 
 			<table>
 				<tbody>

@@ -40,36 +40,38 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="app">
         <Router history={history}>
-          {this.state.user ?
-                  <div>
-                      <Menu fluid>
-                          <Menu.Item as={NavLink} exact to="/">Record</Menu.Item>
-                          <Menu.Item as={NavLink} exact to="/feed" >Feed</Menu.Item>
-                          <Menu.Item as={NavLink} exact to="/leaderboard/week" >Leaderboard</Menu.Item>
-                          <Menu.Item as={NavLink} exact to={`/athlete/${this.state.user.id}`}>Profile</Menu.Item>
-                      </Menu>
+             <div className="app">
+                 {this.state.user ?
+                     <Menu inverted fluid size='tiny' style={{ borderRadius: 0}}>
+                         <div className={"container"}>
+                             <Menu.Item as={NavLink} exact to="/">Record</Menu.Item>
+                             <Menu.Item as={NavLink} exact to="/feed" >Feed</Menu.Item>
+                             <Menu.Item as={NavLink} to="/leaderboard" >Leaderboard</Menu.Item>
+                             <Menu.Item as={NavLink} exact to={`/athlete/${this.state.user.id}`}>Profile</Menu.Item>
+                         </div>
+                     </Menu> : ''}
+                 <div className="main container">
+                     {this.state.user ?
+                         <div className={"margin-s"}>
+                             <Route path="/" exact component={Track} />
+                             <Route path="/feed" exact component={Feed} />
+                             <Route path="/leaderboard/:period?" component={Leaderboard} />
+                             <Route path="/athlete/:id" component={Profile} />
+                             <Route path="/login" exact render={props => <Login onSuccess={this.onLogin} />} />
+                             <Route path="/register" exact render={props => <Register onSuccess={this.onLogin} />} />
+                         </div>
 
-                    <div className={"margin-s"}>
-                      <Route path="/" exact component={Track} />
-                      <Route path="/feed" exact component={Feed} />
-                      <Route path="/leaderboard/:period" component={Leaderboard} />
-                      <Route path="/athlete/:id" component={Profile} />
-                      <Route path="/login" exact render={props => <Login onSuccess={this.onLogin} />} />
-                      <Route path="/register" exact render={props => <Register onSuccess={this.onLogin} />} />
-                    </div>
-                  </div>
-              :
+                         :
 
-              <div>
-                <Route path="/login" render={props => <Login onSuccess={this.onLogin} />} />
-                <Route path="/register" render={props => <Register onSuccess={this.onLogin} />} />
-              </div>
-          }
-
-        </Router>
-      </div>
+                         <div>
+                             <Route path="/login" render={props => <Login onSuccess={this.onLogin} />} />
+                             <Route path="/register" render={props => <Register onSuccess={this.onLogin} />} />
+                         </div>
+                     }
+                 </div>
+         </div>
+      </Router>
     )
   }
 }

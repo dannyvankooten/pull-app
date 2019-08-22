@@ -21,9 +21,7 @@ class Feed extends React.Component {
             d.setDate(0);
         }
         api.get(`/leaderboard?limit=20&after=${Math.round(d.getTime()/1000)}`)
-            .then(data => {
-                this.setState({data})
-            })
+            .then(data => this.setState({data}))
     }
 
     componentDidUpdate(prevProps) {
@@ -40,10 +38,10 @@ class Feed extends React.Component {
                 <h1>Leaderboard</h1>
                 <Menu text>
                     <Menu.Item header>Show</Menu.Item>
-                    <Menu.Item as={NavLink} to="/leaderboard/week" exact>this week</Menu.Item>
+                    <Menu.Item as={NavLink} to="/leaderboard" exact>this week</Menu.Item>
                     <Menu.Item as={NavLink} to="/leaderboard/month" exact>this month</Menu.Item>
                 </Menu>
-                <Table celled>
+                <Table celled unstackable>
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell width={1}>Rank</Table.HeaderCell>
