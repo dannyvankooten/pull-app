@@ -6,6 +6,7 @@ import Profile from './components/Profile.js';
 import Feed from './components/Feed.js';
 import Login from './components/Login.js';
 import Register from './components/Register.js';
+import Leaderboard from './components/Leaderboard.js';
 import { createBrowserHistory } from "history";
 import api from './lib/api.js';
 import { Menu } from 'semantic-ui-react'
@@ -44,25 +45,19 @@ class App extends React.Component {
           {this.state.user ?
                   <div>
                       <Menu fluid>
-                          <Menu.Item as={NavLink} exact to="/">
-                              Record
-                          </Menu.Item>
-
-                          <Menu.Item as={NavLink} exact to="/feed" >
-                              Feed
-                          </Menu.Item>
-
-                          <Menu.Item as={NavLink} exact to={`/athlete/${this.state.user.id}`}>
-                              Profile
-                          </Menu.Item>
+                          <Menu.Item as={NavLink} exact to="/">Record</Menu.Item>
+                          <Menu.Item as={NavLink} exact to="/feed" >Feed</Menu.Item>
+                          <Menu.Item as={NavLink} exact to="/leaderboard/week" >Leaderboard</Menu.Item>
+                          <Menu.Item as={NavLink} exact to={`/athlete/${this.state.user.id}`}>Profile</Menu.Item>
                       </Menu>
 
                     <div className={"margin-s"}>
                       <Route path="/" exact component={Track} />
-                      <Route path="/feed" component={Feed} />
+                      <Route path="/feed" exact component={Feed} />
+                      <Route path="/leaderboard/:period" component={Leaderboard} />
                       <Route path="/athlete/:id" component={Profile} />
-                      <Route path="/login" render={props => <Login onSuccess={this.onLogin} />} />
-                      <Route path="/register" render={props => <Register onSuccess={this.onLogin} />} />
+                      <Route path="/login" exact render={props => <Login onSuccess={this.onLogin} />} />
+                      <Route path="/register" exact render={props => <Register onSuccess={this.onLogin} />} />
                     </div>
                   </div>
               :

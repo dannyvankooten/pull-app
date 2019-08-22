@@ -79,7 +79,7 @@ class Track extends React.Component {
                         <span className="control">-</span>
                     </td>
                     <td onMouseDown={evt => evt.preventDefault()}>
-                         <span className="count" onClick={evt => evt.preventDefault()}>{this.state.count}</span>
+                        <span className="count" onClick={evt => evt.preventDefault()}>{this.state.count}</span><br />
                         <small className="muted">repetitions</small>
                     </td>
                     <td onMouseDown={(evt) => {
