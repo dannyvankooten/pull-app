@@ -53,7 +53,7 @@ app.get('/api/session', (req, res) => {
 
 app.post('/api/login', catcher(async(req, res) => {
     const db = await dbPromise;
-    let user = await db.get('SELECT * FROM users WHERE username = ?', [req.body.username]);
+    let user = await db.get('SELECT * FROM users WHERE username = ? LIMIT 1', [req.body.username]);
     if (!user) {
         return res.json(false)
     }
@@ -70,7 +70,7 @@ app.post('/api/login', catcher(async(req, res) => {
 
 app.post('/api/register', catcher(async(req, res) => {
     const db = await dbPromise;
-    let exists = await db.get('SELECT * FROM users WHERE username = ?', req.body.username.toLowerCase());
+    let exists = await db.get('SELECT * FROM users WHERE username = ? LIMIT 1', req.body.username.toLowerCase());
     if (exists) {
         return res.json({ error: "That username is taken, sorry."})
     }
@@ -92,12 +92,13 @@ app.get("/api/users/:id", catcher(async (req, res) => {
 app.get("/api/activities", catcher(async (req, res) => {
     const db = await dbPromise;
     let data;
+    const limit = parseInt(req.query.limit) || 50;
     if (req.query.feed) {
-        data = await db.all('SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.id DESC', [])
+        data = await db.all(`SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.id DESC LIMIT ${limit}`, [])
     } else {
-        data = await db.all('SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id WHERE user_id = ? ORDER BY a.id DESC', [ req.session.user.id ])
+        data = await db.all(`SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id WHERE user_id = ? AND a.timestamp > date('now', '-7 days') ORDER BY a.id DESC LIMIT ${limit}`, [ req.session.user.id ])
     }
-    res.json(data.splice(0, req.query.limit || data.length))
+    res.json(data)
 }));
 
 app.post("/api/activities", catcher(async (req, res) => {
