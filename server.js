@@ -53,7 +53,7 @@ app.get('/api/session', (req, res) => {
 
 app.post('/api/login', catcher(async(req, res) => {
     const db = await dbPromise;
-    let user = await db.get('SELECT * FROM users WHERE username = ? LIMIT 1', [req.body.username]);
+    let user = await db.get('SELECT * FROM users WHERE LOWER(username) = ? LIMIT 1', [req.body.username.toLowerCase()]);
     if (!user) {
         return res.json(false)
     }
@@ -70,7 +70,7 @@ app.post('/api/login', catcher(async(req, res) => {
 
 app.post('/api/register', catcher(async(req, res) => {
     const db = await dbPromise;
-    let exists = await db.get('SELECT * FROM users WHERE username = ? LIMIT 1', req.body.username.toLowerCase());
+    let exists = await db.get('SELECT * FROM users WHERE LOWER(username) = ? LIMIT 1', req.body.username.toLowerCase());
     if (exists) {
         return res.json({ error: "That username is taken, sorry."})
     }
