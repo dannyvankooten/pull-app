@@ -9,7 +9,8 @@ class Track extends React.Component {
 
     this.state = {
       count: parseInt(localStorage.getItem('repetitions')) || 1,
-      isLoading: false,
+      loading: false,
+      disabled: 0,
       activities: [],
     };
     this.save = this.save.bind(this);
@@ -49,7 +50,10 @@ class Track extends React.Component {
   }
 
   save(evt) {
-    this.setState({isLoading: true});
+    this.setState({
+        loading: true,
+        disabled: this.state.count * 3
+    });
     localStorage.setItem('repetitions', this.state.count);
 
     api.post('/activities', {
@@ -59,9 +63,16 @@ class Track extends React.Component {
 
         this.setState({
            activities: [activity, ...this.state.activities],
-           isLoading: false,
+           loading: false,
         })
-      })
+      });
+
+    let interval = window.setInterval(() => {
+        this.setState({ disabled: this.state.disabled - 1 });
+        if (this.state.disabled <= 0) {
+            window.clearInterval(interval);
+        }
+    }, 1000);
   }
 
   render() {
@@ -94,7 +105,7 @@ class Track extends React.Component {
             </table>
           </div>
           <div>
-              <Button fluid size='big' onClick={this.save} loading={this.state.isLoading} primary>Save</Button>
+              <Button fluid size='big' onClick={this.save} primary disabled={!!this.state.disabled} loading={this.state.loading} >{this.state.disabled > 0 ? `Wait ${this.state.disabled}s` : `Save`}</Button>
           </div>
        </div>
        <Divider horizontal>History</Divider>
