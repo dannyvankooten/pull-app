@@ -2,7 +2,7 @@ import React from 'react';
 import './Profile.css';
 import api from './../lib/api.js';
 import Chart from './Chart.js';
-import { Menu, Grid } from 'semantic-ui-react'
+import { Menu } from 'semantic-ui-react'
 const empty = { average: 0, total: 0, biggest: 0 };
 
 class Profile extends React.Component {
