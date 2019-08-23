@@ -39,9 +39,9 @@ class Register extends React.Component {
 		<div>
 			<h1>Register</h1>
 			<Form onSubmit={this.submit}>
-				<Form.Input name={"username"} fluid type="text" label='Username' placeholder='Enter your username' required minLength="2" htmlFor="register-username" id={"register-username"} />
+				<Form.Input name={"username"} fluid type="text" label='Username' placeholder='Enter your username' required minLength="2" maxLength="36" htmlFor="register-username" id={"register-username"} />
 				<Form.Input name={"password"} fluid type="password" label='Password' placeholder='Enter your password' required minLength="6" maxLength="72" htmlFor={"register-password"} id={"register-password"} />
-				<Form.Input name={"password_confirmation"} fluid type="password" label='Confirm password' placeholder='Enter your password (again)' required htmlFor={"register-password-confirmation"} id={"register-password-confirmation"} />
+				<Form.Input name={"password_confirmation"} fluid type="password" label='Confirm password' placeholder='Enter your password (again)' minLength="6" maxLength="72" required htmlFor={"register-password-confirmation"} id={"register-password-confirmation"} />
 				<Form.Button>Register</Form.Button>
 				{this.state.error ? <div className="notice notice-warning">{this.state.error}</div> : ''}
 			</Form>

@@ -126,7 +126,8 @@ app.get('/api/stats/:id', catcher(async (req, res) => {
 
 app.get('/api/leaderboard', catcher(async (req, res) => {
     const db = await dbPromise;
-    let data = await db.all('SELECT u.id, u.username, SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest FROM users u LEFT JOIN activities a ON a.user_id = u.id AND a.timestamp > datetime(?, \'unixepoch\') GROUP BY u.id ORDER BY total DESC', req.query.after)
+    let sortBy = req.query.sortBy === 'max' ? 'max' : 'total';
+    let data = await db.all(`SELECT u.id, u.username, SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS max FROM users u LEFT JOIN activities a ON a.user_id = u.id AND a.timestamp > datetime(?, 'unixepoch') GROUP BY u.id ORDER BY ${sortBy} DESC`, [req.query.after])
     res.json(data);
 }));
 

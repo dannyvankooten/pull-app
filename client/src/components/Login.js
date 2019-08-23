@@ -35,8 +35,8 @@ class Login extends React.Component {
 		<div>
 			<h1>Login</h1>
 			<Form onSubmit={this.submit}>
-				<Form.Input name={"username"} fluid type="text" label='Username' placeholder='Enter your username' htmlFor="login-username" id={"login-username"} required />
-				<Form.Input name={"password"} fluid type="password" label='Password' placeholder='Enter your password' htmlFor="login-password" id={"login-password"}  required />
+				<Form.Input name={"username"} fluid type="text" label='Username' placeholder='Enter your username' htmlFor="login-username" id={"login-username"} required  />
+				<Form.Input name={"password"} fluid type="password" label='Password' placeholder='Enter your password' htmlFor="login-password" id={"login-password"}  required minLength="6" maxLength="72" />
 				<Form.Button>Log in</Form.Button>
 				{this.state.error ? <div className="notice notice-warning">{this.state.error}</div> : ''}
 			</Form>
