@@ -28,6 +28,7 @@ export default class Feed extends React.Component {
     fetch(sortBy) {
         const period = this.props.match.params.period || 'week';
         let d = new Date();
+        d.setHours(0, 0, 0);
         if (period === 'week') {
             d.setDate(d.getDate() - d.getDay());
         } else {
