@@ -2,7 +2,7 @@
 set -e
 
 # Variables
-REMOTE_HOST="dvk.co"
+REMOTE_HOST="s1.dvk.co"
 REMOTE_USER="danny"
 SERVER_DIR="/var/www/pull-app.dvk.co"
 
