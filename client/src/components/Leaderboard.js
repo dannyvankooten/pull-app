@@ -32,7 +32,7 @@ export default class Feed extends React.Component {
         if (period === 'week') {
             d.setDate(d.getDate() - d.getDay());
         } else {
-            d.setDate(0);
+            d.setDate(1);
         }
         api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(d.getTime()/1000)}`)
             .then(data => this.setState({data, sortBy}))
