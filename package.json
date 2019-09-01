@@ -1,26 +1,35 @@
 {
-  "name": "pull-app-server",
-  "version": "0.0.1",
-  "private": true,
-  "dependencies": {
-    "bcrypt": "^3.0.6",
-    "bluebird": "^3.5.5",
-    "body-parser": "^1.19.0",
-    "connect-sqlite3": "^0.9.11",
-    "express": "4.13.3",
-    "express-session": "^1.16.2",
-    "history": "^4.9.0",
-    "react-router-dom": "^5.0.1",
-    "sqlite": "^3.0.3"
-  },
+  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "node server.js",
-    "client": "node start-client.js",
-    "dev": "echo \"This command has been deprecated. Use 'npm start'\" && exit 1",
-    "lint": "eslint ."
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject",
+    "test": "jest --watchAll"
+  },
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "dependencies": {
+    "@expo/samples": "~3.0.3",
+    "@expo/vector-icons": "^10.0.3",
+    "@react-navigation/web": "^1.0.0-alpha.9",
+    "expo": "^34.0.1",
+    "expo-asset": "^6.0.0",
+    "expo-constants": "6.0.0",
+    "expo-font": "~6.0.0",
+    "expo-web-browser": "6.0.0",
+    "react": "16.8.3",
+    "react-dom": "^16.8.6",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-34.0.0.tar.gz",
+    "react-native-gesture-handler": "~1.3.0",
+    "react-native-web": "^0.11.4",
+    "react-navigation": "^3.11.0"
   },
   "devDependencies": {
-    "concurrently": "3.1.0"
-  }
+    "babel-preset-expo": "^6.0.0",
+    "jest-expo": "^34.0.0"
+  },
+  "private": true
 }
