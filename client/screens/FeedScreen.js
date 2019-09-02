@@ -31,12 +31,17 @@ export default class FeedScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
+				<Text style={styles.titleText}>Activities</Text>
                 <ScrollView contentContainerStyle={styles.contentContainer}>
-                    <Text style={styles.baseText}>
-                        {this.state.activities.map(a => (
-                            <Text key={a.id}>{a.username} did {a.repetitions} repetitions. <TimeAgo time={a.date} />{'\n'}</Text>
-                        ))}
-                    </Text>
+					{this.state.activities.map(a => (
+						<View key={a.id} style={{ padding: 3 }}>
+						<Text style={styles.baseText}>
+							<Text style={styles.linkText} onPress={() => this.props.navigation.push("Profile", { id: a.user_id })}>{a.username}</Text>
+							<Text> did {a.repetitions} reps </Text>
+							<TimeAgo time={a.date} interval={60000} style={styles.mutedText}/>
+						</Text>
+						</View>
+					))}
                 </ScrollView>
             </View>
         )
@@ -45,17 +50,22 @@ export default class FeedScreen extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-
-    contentContainer: {
         padding: 15,
-    },
-    baseText: {
     },
     titleText: {
         fontSize: 20,
         fontWeight: 'bold',
+		marginBottom: 10,
     },
+	linkText: {
+    	color: '#4183c4'
+	},
+	baseText: {
+    	fontWeight: "600"
+	},
+	mutedText: {
+    	color: 'rgba(0,0,0,.4)',
+		fontSize: 12,
+		fontWeight: 'normal',
+	}
 });

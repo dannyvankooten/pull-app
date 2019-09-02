@@ -5,10 +5,10 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  AsyncStorage
 } from 'react-native';
 
 import api from './../util/api.js';
+import auth from './../util/auth.js';
 
 export default class LoginScreen extends React.Component {
 
@@ -21,14 +21,27 @@ export default class LoginScreen extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  async handleSubmit() {
+  handleSubmit() {
     const { username, password} = this.state;
 
+	if ( username === "") {
+		return this.setState({ error: "Enter a username."});
+	}
+
+	if (password === "" ) {
+		return this.setState({ error: "Enter a password."});
+	}
+
     api.post('/login', { username, password})
-        .then(async (u) => {
-          console.log(u);
-          await AsyncStorage.setItem("userToken", u.token);
-          this.props.navigation.navigate("App")
+        .then(u => {
+        	if (!u) {
+        		this.setState({ error: "Whoops. Something went wrong."});
+        		return;
+			}
+
+        	auth.setUser(u);
+        	auth.setToken(u.token);
+          	this.props.navigation.navigate("App")
         })
   }
 
@@ -36,7 +49,9 @@ export default class LoginScreen extends React.Component {
     return (
         <View style={styles.container}>
           <Text style={styles.titleText}>Login</Text>
+			{this.state.error ? <Text style={{ color: 'red', marginTop: 10}}>{this.state.error}</Text> : []}
           <View style={styles.form}>
+			<Text style={styles.labelText}>Username</Text>
             <TextInput
                 editable={true}
                 onChangeText={(username) => this.setState({username})}
@@ -47,6 +62,7 @@ export default class LoginScreen extends React.Component {
                 value={this.state.username}
             />
 
+			<Text style={styles.labelText}>Password</Text>
             <TextInput
                 editable={true}
                 onChangeText={(password) => this.setState({password})}
@@ -62,8 +78,10 @@ export default class LoginScreen extends React.Component {
               <Text style={styles.buttonText}> Log in </Text>
             </TouchableOpacity>
 
-
-          </View>
+			<View style={{ marginTop: 12}}>
+				<Text>No account yet? <Text style={styles.linkText} onPress={() => this.props.navigation.navigate("Register")}>Register here</Text>.</Text>
+			</View>
+		  </View>
         </View>
     );
   }
@@ -83,11 +101,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+	labelText: {
+		marginTop: 20,
+	},
   inputText: {
     padding: 6,
     borderWidth: 1,
     borderColor: "#efefef",
-    marginTop: 20,
     width: '100%',
   },
   buttonWrapper: {
@@ -98,4 +118,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff"
   },
+	linkText: {
+		color: '#4183c4'
+	},
 });

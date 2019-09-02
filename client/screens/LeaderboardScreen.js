@@ -71,7 +71,7 @@ export default class LeaderboardScreen extends React.Component {
                     {data.map((u, index) => (
                         <TableWrapper key={index} style={styles.row}>
                             <Cell data={index+1} textStyle={styles.text}/>
-                            <Cell data={<Text style={styles.text} onPress={() => this.props.navigation.push('Profile', { id: u.id })}>{u.username}</Text>} textStyle={styles.text}/>
+                            <Cell data={<Text style={styles.linkText} onPress={() => this.props.navigation.push('Profile', { id: u.id })}>{u.username}</Text>} textStyle={styles.text}/>
                             <Cell data={u.total} textStyle={styles.text}  onPress={this.handleSort('total')} />
                             <Cell data={u.max} textStyle={styles.text} onPress={this.handleSort('max')} />
                         </TableWrapper>
@@ -90,4 +90,8 @@ const styles = StyleSheet.create({
     headerText: { margin: 6, fontWeight: 'bold'},
     text: { margin: 6 },
     row: { flexDirection: 'row' },
+	linkText: {
+    	margin: 6,
+		color: '#4183c4'
+	},
 });

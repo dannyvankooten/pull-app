@@ -100,24 +100,24 @@ app.get("/api/activities", catcher(async (req, res) => {
     const db = await dbPromise;
     let data;
     const limit = parseInt(req.query.limit) || 50;
-    if (req.query.feed) {
-        data = await db.all(`SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.id DESC LIMIT ${limit}`, [])
-    } else {
-        data = await db.all(`SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id WHERE user_id = ? AND a.timestamp > date('now', '-7 days') ORDER BY a.id DESC LIMIT ${limit}`, [ req.session.user.id ])
+    if (req.query.user_id > 0) {
+		data = await db.all(`SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id WHERE user_id = ? AND a.timestamp > date('now', '-7 days') ORDER BY a.id DESC LIMIT ${limit}`, [ req.query.user_id ])
+	} else {
+		data = await db.all(`SELECT a.*, u.username FROM activities a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.id DESC LIMIT ${limit}`, [])
     }
     res.json(data)
 }));
 
 app.post("/api/activities", catcher(async (req, res) => {
     const db = await dbPromise;
-    const result = await db.run('INSERT INTO activities(user_id, repetitions) VALUES(?, ?)', [req.session.user.id, req.body.repetitions]);
+    const result = await db.run('INSERT INTO activities(user_id, repetitions) VALUES(?, ?)', [req.body.user_id, req.body.repetitions]);
     const data = await db.get('SELECT * FROM activities WHERE id = ?', result.lastID);
     res.json(data)
 }));
 
 app.delete("/api/activities/:id", catcher(async (req, res) => {
     const db = await dbPromise;
-    await db.run('DELETE FROM activities WHERE user_id = ? AND id = ?', [req.session.user.id, req.params.id]);
+    await db.run('DELETE FROM activities WHERE user_id = ? AND id = ?', [req.params.id]);
     res.json(true)
 }));
 
@@ -127,7 +127,7 @@ app.get('/api/stats/:id', catcher(async (req, res) => {
     let week = await db.get(createSql('-7 days'), req.params.id);
     let month = await db.get(createSql('-30 days'), req.params.id);
     let year = await db.get(createSql('-365 days'), req.params.id);
-    let perDay = await db.all('SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest, date(a.timestamp) AS `date` FROM activities a WHERE timestamp > date("now", "-365 days") AND a.user_id = ? GROUP by date(a.timestamp)', req.params.id)
+    let perDay = await db.all('SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest, date(a.timestamp) AS `date` FROM activities a WHERE timestamp > date("now", "-365 days") AND a.user_id = ? GROUP by date(a.timestamp)', req.params.id);
     res.json({week, month, year, perDay})
 }));
 

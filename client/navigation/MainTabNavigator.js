@@ -53,6 +53,7 @@ ActivityStack.navigationOptions = {
 const FeedStack = createStackNavigator(
     {
         Feed: FeedScreen,
+		Profile: ProfileScreen,
     },
     config
 );
