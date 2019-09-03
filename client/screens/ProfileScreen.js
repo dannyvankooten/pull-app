@@ -7,7 +7,7 @@ import {
     View,
 	RefreshControl
 } from 'react-native';
-import { VictoryChart, VictoryTheme, VictoryBar, VictoryAxis, VictoryTooltip, VictoryLabel } from "victory-native";
+
 const empty = { average: 0, total: 0, biggest: 0 };
 import api from './../util/api.js';
 import Chart from "../components/Chart";
@@ -48,6 +48,10 @@ export default class ProfileScreen extends React.Component{
         }
     }
 
+	static navigationOptions = {
+		title: 'Profile',
+	};
+
     componentDidMount() {
     	this.refresh()
     }
@@ -56,7 +60,7 @@ export default class ProfileScreen extends React.Component{
         const id = this.props.navigation.getParam('id');
         const prevId = prevProps.navigation.getParam('id');
 
-        if (id !== prevId) {
+        if (id && id !== prevId) {
             this.fetch(id);
         }
     }
@@ -67,7 +71,8 @@ export default class ProfileScreen extends React.Component{
 		if (id) {
 			this.fetch(id);
 		} else {
-			auth.getUser().then(u => this.fetch(u.id))
+			const user = auth.getUser();
+			this.fetch(user.id);
 		}
 	};
 
@@ -82,7 +87,7 @@ export default class ProfileScreen extends React.Component{
 
     render() {
         return (
-            <ScrollView  vertical={true} style={styles.container} refreshControl={
+            <ScrollView vertical={true} style={styles.container} refreshControl={
 				<RefreshControl
 					refreshing={this.state.loading}
 					onRefresh={this.refresh}

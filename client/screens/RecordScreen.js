@@ -24,19 +24,20 @@ export default class RecordScreen extends React.Component {
         this.save = this.save.bind(this);
     }
 
-    componentDidMount() {
-		auth.getUser()
-			.then(u => {
-				this.user = u;
+	static navigationOptions = {
+		title: 'Record new activity',
+	};
 
-				api.get(`/activities?user_id=${u.id}limit=10`)
-					.then((activities) => {
-						activities = activities.map(a => {
-							a.date = api.date(a.timestamp);
-							return a;
-						});
-						this.setState({activities})
-					})
+    componentDidMount() {
+    	const user = auth.getUser();
+
+    	api.get(`/activities?user_id=${user.id}limit=10`)
+			.then((activities) => {
+				activities = activities.map(a => {
+					a.date = api.date(a.timestamp);
+					return a;
+				});
+				this.setState({activities})
 			});
 
         AsyncStorage.getItem("reps")

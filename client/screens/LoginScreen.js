@@ -21,6 +21,10 @@ export default class LoginScreen extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  static navigationOptions = {
+  	title: 'Please sign in',
+  };
+
   handleSubmit() {
     const { username, password} = this.state;
 

@@ -10,6 +10,7 @@ import {
 
 import api from './../util/api.js';
 import TimeAgo from 'react-native-timeago';
+import auth from "../util/auth";
 
 export default class FeedScreen extends React.Component {
     constructor(props) {
@@ -19,7 +20,14 @@ export default class FeedScreen extends React.Component {
             loading: true
         };
         this.refresh = this.refresh.bind(this);
+
+        // auth.setUser(null)
+		// auth.setToken(null);
     }
+
+	static navigationOptions = {
+		title: 'Activity feed',
+	};
 
     componentDidMount() {
        this.refresh();
@@ -48,7 +56,6 @@ export default class FeedScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-				<Text style={styles.titleText}>Activities</Text>
                 <ScrollView contentContainerStyle={styles.contentContainer} refreshControl={
                     <RefreshControl
                         refreshing={this.state.loading}

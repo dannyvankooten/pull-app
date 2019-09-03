@@ -22,6 +22,10 @@ export default class LeaderboardScreen extends React.Component {
         this.fetch = this.fetch.bind(this);
     }
 
+	static navigationOptions = {
+		title: 'Leaderboard',
+	};
+
     componentDidMount() {
         this.fetch();
 		AppState.addEventListener('change', this.handleAppStateChange);
@@ -69,9 +73,6 @@ export default class LeaderboardScreen extends React.Component {
 				refreshing={this.state.loading}
 				onRefresh={this.fetch}
 			/>}>
-                <Text style={{fontSize: 30, fontWeight: 'bold'}}>
-                    Leaderboard
-                </Text>
                 <Text style={{ marginTop: 20}}>
                     <Text style={{ fontWeight: 'bold'}}>Show &nbsp;</Text>
                     <Text onPress={this.handlePeriodChange('last-week')} style={{color: '#888', fontWeight: period === 'last-week' ? 'bold' : 'normal'}}>last week</Text>

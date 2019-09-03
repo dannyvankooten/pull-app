@@ -1,8 +1,15 @@
 import { AsyncStorage } from 'react-native';
 
-async function getToken() {
-	const userToken = await AsyncStorage.getItem('userToken');
-	return typeof (userToken) === "string" ? userToken : null;
+let userToken, user;
+
+async function init() {
+	userToken = await AsyncStorage.getItem('userToken');
+	const data = await AsyncStorage.getItem('user');
+	user = JSON.parse(data);
+}
+
+function getToken() {
+	return userToken;
 }
 
 function setToken(token) {
@@ -13,9 +20,8 @@ function setUser(user) {
 	return AsyncStorage.setItem("user", JSON.stringify(user));
 }
 
-async function getUser() {
-	const data = await AsyncStorage.getItem('user');
-	return JSON.parse(data);
+function getUser() {
+	return user;
 }
 
-export default { getToken, getUser, setToken, setUser }
+export default { init, getToken, getUser, setToken, setUser }
