@@ -7,7 +7,7 @@ import {
     View,
 	RefreshControl
 } from 'react-native';
-
+import GestureRecognizer from 'react-native-swipe-gestures';
 const empty = { average: 0, total: 0, biggest: 0 };
 import api from './../util/api.js';
 import Chart from "../components/Chart";
@@ -45,6 +45,7 @@ export default class ProfileScreen extends React.Component{
             perDay: [ 1],
             user: {},
             chartPeriod: 'week',
+			periodAgo: 0
         }
     }
 
@@ -85,6 +86,16 @@ export default class ProfileScreen extends React.Component{
             .then(d => this.setState({...d, loading: false}))
     }
 
+	onSwipeLeft(gestureState) {
+		const periodAgo = Math.min(0, ++this.state.periodAgo);
+		this.setState({periodAgo});
+	}
+
+	onSwipeRight(gestureState) {
+		const periodAgo = --this.state.periodAgo;
+		this.setState({periodAgo});
+	}
+
     render() {
         return (
             <ScrollView vertical={true} style={styles.container} refreshControl={
@@ -96,9 +107,14 @@ export default class ProfileScreen extends React.Component{
                 <Text style={styles.titleText}>{this.state.user.username}</Text>
 
 				<View>
-					<Chart data={this.state.perDay} period={this.state.chartPeriod} />
+					<GestureRecognizer
+						onSwipeLeft={(state) => this.onSwipeLeft(state)}
+						onSwipeRight={(state) => this.onSwipeRight(state)}
+						config={{}}
+					>
+						<Chart data={this.state.perDay} period={this.state.chartPeriod} periodAgo={this.state.periodAgo} />
+					</GestureRecognizer>
 				</View>
-
 				<View style={{ marginTop: 20}}>
 					<Table title="Last week" data={this.state.week} />
 					<Table title="Last month" data={this.state.month} />

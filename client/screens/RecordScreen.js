@@ -29,9 +29,9 @@ export default class RecordScreen extends React.Component {
 	};
 
     componentDidMount() {
-    	const user = auth.getUser();
+    	const user = this.user = auth.getUser();
 
-    	api.get(`/activities?user_id=${user.id}limit=10`)
+    	api.get(`/activities?user_id=${user.id}&limit=10`)
 			.then((activities) => {
 				activities = activities.map(a => {
 					a.date = api.date(a.timestamp);

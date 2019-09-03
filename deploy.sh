@@ -36,8 +36,8 @@ rsync -qru "$DIR_TEMP/." "$REMOTE:$DIR_DEPLOY" --exclude="client/" --no-perms --
 
 # prepare application & switch symlinks
 echo "-- finalising deployment"
-ssh -t "$REMOTE" "\
-	cd $DIR_DEPLOY \
+ssh -t "$REMOTE" "
+	cd $DIR_DEPLOY
 	npm install
   sudo systemctl restart pull-app
     "
