@@ -4,6 +4,7 @@ import {
     StyleSheet,
     Text,
     View,
+    RefreshControl
 } from 'react-native';
 
 import api from './../util/api.js';
@@ -14,17 +15,25 @@ export default class FeedScreen extends React.Component {
         super(props);
         this.state = {
             activities: [],
+            loading: true
         };
+        this.refresh = this.refresh.bind(this);
     }
 
     componentDidMount() {
+       this.refresh()
+    }
+
+    refresh() {
+        this.setState({ loading: true });
+
         api.get('/activities?feed=1&limit=100')
             .then((activities) => {
                 activities = activities.map(a => {
                     a.date = api.date(a.timestamp);
                     return a;
                 });
-                this.setState({activities});
+                this.setState({activities, loading: false});
             });
     }
 
@@ -32,7 +41,12 @@ export default class FeedScreen extends React.Component {
         return (
             <View style={styles.container}>
 				<Text style={styles.titleText}>Activities</Text>
-                <ScrollView contentContainerStyle={styles.contentContainer}>
+                <ScrollView contentContainerStyle={styles.contentContainer} refreshControl={
+                    <RefreshControl
+                        refreshing={this.state.loading}
+                        onRefresh={this.refresh}
+                    />
+                }>
 					{this.state.activities.map(a => (
 						<View key={a.id} style={{ padding: 3 }}>
 						<Text style={styles.baseText}>
