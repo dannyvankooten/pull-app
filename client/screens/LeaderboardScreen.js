@@ -4,6 +4,8 @@ import {
     StyleSheet,
     Text,
     View,
+	RefreshControl,
+	AppState
 } from 'react-native';
 import api from './../util/api.js';
 import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
@@ -15,12 +17,21 @@ export default class LeaderboardScreen extends React.Component {
             data: [],
             sortBy: 'total',
             period: 'last-week',
+			loading: false,
         };
+        this.fetch = this.fetch.bind(this);
     }
 
     componentDidMount() {
         this.fetch();
+		AppState.addEventListener('change', this.handleAppStateChange);
     }
+
+	handleAppStateChange = nextAppState => {
+		if (nextAppState === 'active') {
+			this.fetch();
+		}
+	};
 
     fetch(sortBy = this.state.sortBy, period = this.state.period) {
         let d = new Date();
@@ -30,8 +41,9 @@ export default class LeaderboardScreen extends React.Component {
         } else {
             d.setDate(1);
         }
+        this.setState({loading: true});
         api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(d.getTime()/1000)}`)
-            .then(data => this.setState({data, sortBy, period}))
+            .then(data => this.setState({data, sortBy, period, loading: false}))
     }
 
     handlePeriodChange = (newPeriod) => () => {
@@ -53,7 +65,10 @@ export default class LeaderboardScreen extends React.Component {
     render() {
         const { sortBy, data, period } = this.state;
         return (
-            <View style={{ padding: 10 }}>
+            <ScrollView style={{ padding: 10 }} vertical={true}  refreshControl={<RefreshControl
+				refreshing={this.state.loading}
+				onRefresh={this.fetch}
+			/>}>
                 <Text style={{fontSize: 30, fontWeight: 'bold'}}>
                     Leaderboard
                 </Text>
@@ -63,24 +78,20 @@ export default class LeaderboardScreen extends React.Component {
                     &nbsp;
                     <Text onPress={this.handlePeriodChange('last-month')} style={{color: '#888', fontWeight: period === 'last-month' ? 'bold' : 'normal'}}>last month</Text>
                 </Text>
-
-                <ScrollView vertical={true} style={{ marginTop: 20}}>
-
-                <Table borderStyle={{borderWidth: 1, borderColor: '#efefef'}}>
-                    <Row data={["Rank", "Athlete", <Text onPress={this.handleSort('total')} style={styles.headerText}>Total</Text>, <Text onPress={this.handleSort('max')} style={styles.headerText}>Max</Text>]} style={styles.head} textStyle={styles.headerText}/>
-                    {data.map((u, index) => (
-                        <TableWrapper key={index} style={styles.row}>
-                            <Cell data={index+1} textStyle={styles.text}/>
-                            <Cell data={<Text style={styles.linkText} onPress={() => this.props.navigation.push('Profile', { id: u.id })}>{u.username}</Text>} textStyle={styles.text}/>
-                            <Cell data={u.total} textStyle={styles.text}  onPress={this.handleSort('total')} />
-                            <Cell data={u.max} textStyle={styles.text} onPress={this.handleSort('max')} />
-                        </TableWrapper>
-                    ))}
-                </Table>
-                </ScrollView>
-
-
-            </View>
+                <View style={{ marginTop: 20}}>
+					<Table borderStyle={{borderWidth: 1, borderColor: '#efefef'}}>
+						<Row data={["Rank", "Athlete", <Text onPress={this.handleSort('total')} style={styles.headerText}>Total</Text>, <Text onPress={this.handleSort('max')} style={styles.headerText}>Max</Text>]} style={styles.head} textStyle={styles.headerText}/>
+						{data.map((u, index) => (
+							<TableWrapper key={index} style={styles.row}>
+								<Cell data={index+1} textStyle={styles.text}/>
+								<Cell data={<Text style={styles.linkText} onPress={() => this.props.navigation.push('Profile', { id: u.id })}>{u.username}</Text>} textStyle={styles.text}/>
+								<Cell data={u.total} textStyle={styles.text}  onPress={this.handleSort('total')} />
+								<Cell data={u.max} textStyle={styles.text} onPress={this.handleSort('max')} />
+							</TableWrapper>
+						))}
+					</Table>
+                </View>
+            </ScrollView>
         )
     }
 }

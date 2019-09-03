@@ -5,11 +5,13 @@ import {
     StyleSheet,
     Text,
     View,
+	RefreshControl
 } from 'react-native';
 import { VictoryChart, VictoryTheme, VictoryBar, VictoryAxis, VictoryTooltip, VictoryLabel } from "victory-native";
 const empty = { average: 0, total: 0, biggest: 0 };
 import api from './../util/api.js';
 import Chart from "../components/Chart";
+import auth from "../util/auth";
 
 function Table(props) {
 	return (
@@ -47,7 +49,7 @@ export default class ProfileScreen extends React.Component{
     }
 
     componentDidMount() {
-        this.fetch(this.props.navigation.getParam('id', 1))
+    	this.refresh()
     }
 
     componentDidUpdate(prevProps) {
@@ -59,17 +61,33 @@ export default class ProfileScreen extends React.Component{
         }
     }
 
+    refresh = () => {
+		const id = this.props.navigation.getParam('id');
+
+		if (id) {
+			this.fetch(id);
+		} else {
+			auth.getUser().then(u => this.fetch(u.id))
+		}
+	};
+
     fetch(id) {
+    	this.setState({ loading: true });
         api.get(`/users/${id}`)
             .then(d => this.setState(d));
 
         api.get(`/stats/${id}`)
-            .then(d => this.setState(d))
+            .then(d => this.setState({...d, loading: false}))
     }
 
     render() {
         return (
-            <ScrollView  vertical={true} style={styles.container}>
+            <ScrollView  vertical={true} style={styles.container} refreshControl={
+				<RefreshControl
+					refreshing={this.state.loading}
+					onRefresh={this.refresh}
+				/>
+			}>
                 <Text style={styles.titleText}>{this.state.user.username}</Text>
 
 				<View>

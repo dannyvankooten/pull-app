@@ -39,7 +39,8 @@ export default class RecordScreen extends React.Component {
 					})
 			});
 
-        AsyncStorage.getItem("reps").then(reps => reps ? this.setState({reps}) : false);
+        AsyncStorage.getItem("reps")
+			.then(reps => reps ? this.setState({reps}) : false);
     }
 
     save() {

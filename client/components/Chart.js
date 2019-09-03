@@ -56,8 +56,8 @@ export default function Chart(props) {
                 <VictoryChart
                     theme={VictoryTheme.material}
                     animate={{
-                        duration: 800,
-                        onLoad: { duration: 800 }
+                        duration: 400,
+                        onLoad: { duration: 400 }
                     }}
                     height={220}
                     padding={{ top: 20, bottom: 40, left: 0, right: 40 }}

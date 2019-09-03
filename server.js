@@ -83,7 +83,7 @@ app.post('/api/register', catcher(async(req, res) => {
     }
 
     let passwordHash = await bcrypt.hash(req.body.password, 10);
-    let result = await db.run('INSERT INTO users(username, password) VALUES(?, ?)', [req.body.username, passwordHash]);
+    let result = await db.run('INSERT INTO users(username, password, token) VALUES(?, ?, ?)', [req.body.username, passwordHash, randomstring.generate(255)]);
     let user = await db.get('SELECT * FROM users WHERE id = ?', result.lastID);
     delete user.password;
     req.session.user = user;
@@ -110,14 +110,14 @@ app.get("/api/activities", catcher(async (req, res) => {
 
 app.post("/api/activities", catcher(async (req, res) => {
     const db = await dbPromise;
-    const result = await db.run('INSERT INTO activities(user_id, repetitions) VALUES(?, ?)', [req.body.user_id, req.body.repetitions]);
+    const result = await db.run('INSERT INTO activities(user_id, repetitions) VALUES(?, ?)', [req.session.user ? req.session.user.id : req.body.user_id, req.body.repetitions]);
     const data = await db.get('SELECT * FROM activities WHERE id = ?', result.lastID);
     res.json(data)
 }));
 
 app.delete("/api/activities/:id", catcher(async (req, res) => {
     const db = await dbPromise;
-    await db.run('DELETE FROM activities WHERE user_id = ? AND id = ?', [req.params.id]);
+    await db.run('DELETE FROM activities WHERE id = ?', [req.params.id]);
     res.json(true)
 }));
 

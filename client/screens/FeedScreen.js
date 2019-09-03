@@ -4,7 +4,8 @@ import {
     StyleSheet,
     Text,
     View,
-    RefreshControl
+    RefreshControl,
+	AppState
 } from 'react-native';
 
 import api from './../util/api.js';
@@ -21,8 +22,15 @@ export default class FeedScreen extends React.Component {
     }
 
     componentDidMount() {
-       this.refresh()
+       this.refresh();
+       AppState.addEventListener('change', this.handleAppStateChange);
     }
+
+	handleAppStateChange = nextAppState => {
+		if (nextAppState === 'active') {
+			this.refresh();
+		}
+	};
 
     refresh() {
         this.setState({ loading: true });
