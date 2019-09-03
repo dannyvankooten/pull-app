@@ -4,7 +4,7 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import ActivityScreen from "../screens/ActivityScreen";
+import RecordScreen from "../screens/RecordScreen";
 import FeedScreen from "../screens/FeedScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import LeaderboardScreen from "../screens/LeaderboardScreen";
@@ -38,7 +38,7 @@ HomeStack.navigationOptions = {
 // activity
 const ActivityStack = createStackNavigator(
     {
-        Activity: ActivityScreen,
+        Activity: RecordScreen,
     },
     config
 );

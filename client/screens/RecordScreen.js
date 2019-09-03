@@ -1,17 +1,18 @@
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import {
-    Button,
+    ScrollView,
     StyleSheet,
     Text,
     View,
-	TouchableOpacity
+	TouchableOpacity,
+    AsyncStorage
 } from 'react-native';
 import TimeAgo from 'react-native-timeago';
 import api from "../util/api.js";
 import auth from "../util/auth.js";
 
-export default class ActivityScreen extends React.Component {
+export default class RecordScreen extends React.Component {
     constructor(props) {
         super(props);
 
@@ -27,6 +28,7 @@ export default class ActivityScreen extends React.Component {
 		auth.getUser()
 			.then(u => {
 				this.user = u;
+
 				api.get(`/activities?user_id=${u.id}limit=10`)
 					.then((activities) => {
 						activities = activities.map(a => {
@@ -36,14 +38,16 @@ export default class ActivityScreen extends React.Component {
 						this.setState({activities})
 					})
 			});
+
+        AsyncStorage.getItem("reps").then(reps => reps ? this.setState({reps}) : false);
     }
 
-
-
-    save(evt) {
+    save() {
         this.setState({
             loading: true,
         });
+
+        AsyncStorage.setItem("reps", String(this.state.reps));
 
         api.post('/activities', {
         	user_id: this.user.id,
@@ -77,9 +81,10 @@ export default class ActivityScreen extends React.Component {
 					</TouchableOpacity>
                 </View>
 				<View style={{ marginTop: 20}}>
-					<View style={{ borderBottomWidth: 1, borderBottomColor: "#efefef",  marginBottom: 6}}><Text style={{fontSize: 16, fontWeight: "bold"}}>History</Text></View>
+					<View style={{ borderBottomWidth: 1, borderBottomColor: "#efefef",  marginBottom: 6, paddingBottom: 6}}><Text style={{fontSize: 16, fontWeight: "bold"}}>History</Text></View>
+                    <ScrollView vertical={true}>
 					{this.state.activities.map(a => (
-						<View key={a.id}>
+						<View key={a.id} style={{ marginBottom: 4}}>
 							<Text>
 								<Text>You</Text>
 								<Text> did </Text>
@@ -89,6 +94,7 @@ export default class ActivityScreen extends React.Component {
 							</Text>
 						</View>
 					))}
+                    </ScrollView>
 				</View>
             </View>
         )

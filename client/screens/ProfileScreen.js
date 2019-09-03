@@ -9,6 +9,7 @@ import {
 import { VictoryChart, VictoryTheme, VictoryBar, VictoryAxis, VictoryTooltip, VictoryLabel } from "victory-native";
 const empty = { average: 0, total: 0, biggest: 0 };
 import api from './../util/api.js';
+import Chart from "../components/Chart";
 
 function Table(props) {
 	return (
@@ -41,8 +42,7 @@ export default class ProfileScreen extends React.Component{
             year: empty,
             perDay: [ 1],
             user: {},
-            chartGroupBy: 'week',
-			chartData: [],
+            chartPeriod: 'week',
         }
     }
 
@@ -64,45 +64,24 @@ export default class ProfileScreen extends React.Component{
             .then(d => this.setState(d));
 
         api.get(`/stats/${id}`)
-            .then(d => {
-            	d.chartData = d.perDay.map((v, i) => {
-					return {
-						x: v.date,
-						y: v.total,
-						label: v.total,
-					};
-				});
-            	console.log(d)
-				this.setState(d);
-			})
+            .then(d => this.setState(d))
     }
 
     render() {
-    	console.log(this.state)
         return (
-            <View style={styles.container}>
+            <ScrollView  vertical={true} style={styles.container}>
                 <Text style={styles.titleText}>{this.state.user.username}</Text>
 
 				<View>
-					<VictoryChart
-						theme={VictoryTheme.material}
-						domainPadding={10}
-						animate={{
-							duration: 800,
-							onLoad: { duration: 800 }
-						}}>
-						<VictoryAxis tickValues={[ this.state.chartData[0] ? this.state.chartData[0].x : '']} />
-						<VictoryAxis dependentAxis />
-						<VictoryBar data={this.state.chartData}  />
-					</VictoryChart>
+					<Chart data={this.state.perDay} period={this.state.chartPeriod} />
 				</View>
 
-				<ScrollView vertical={true} style={{ marginTop: 20}}>
+				<View style={{ marginTop: 20}}>
 					<Table title="Last week" data={this.state.week} />
 					<Table title="Last month" data={this.state.month} />
 					<Table title="Last year" data={this.state.year} />
-				</ScrollView>
-            </View>
+				</View>
+            </ScrollView>
         )
     }
 }
