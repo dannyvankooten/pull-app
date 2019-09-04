@@ -24,8 +24,12 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      	"supportsTablet": true,
+		"bundleIdentifier": "com.dvko.pullapp"
     },
+	  "android": {
+		  "package": "com.dvko.pullapp"
+	  },
     "description": "",
     "githubUrl": "https://github.com/dannyvankooten/pull-app"
   }
