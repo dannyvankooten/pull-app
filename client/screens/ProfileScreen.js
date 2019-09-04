@@ -42,10 +42,12 @@ export default class ProfileScreen extends React.Component{
             week: empty,
             month: empty,
             year: empty,
-            perDay: [ 1],
+            perDay: [],
             user: {},
             chartPeriod: 'week',
-			periodAgo: 0
+			periodAgo: 0,
+			loading: false,
+			refreshing: false,
         }
     }
 
@@ -54,7 +56,7 @@ export default class ProfileScreen extends React.Component{
 	};
 
     componentDidMount() {
-    	this.refresh()
+    	this.loadData()
     }
 
     componentDidUpdate(prevProps) {
@@ -62,28 +64,27 @@ export default class ProfileScreen extends React.Component{
         const prevId = prevProps.navigation.getParam('id');
 
         if (id && id !== prevId) {
-            this.fetch(id);
+            this.loadData();
         }
     }
 
-    refresh = () => {
-		const id = this.props.navigation.getParam('id');
-
-		if (id) {
-			this.fetch(id);
-		} else {
-			const user = auth.getUser();
-			this.fetch(user.id);
-		}
+    refreshData= () => {
+		this.setState({ refreshing: true });
+		this.loadData()
+			.finally(() => this.setState({refreshing: false}));
 	};
 
-    fetch(id) {
-    	this.setState({ loading: true });
+    loadData() {
+		this.setState({ loading: true,  week: empty, month: empty, year: empty, perDay: [] });
+		const user = auth.getUser();
+		const id = this.props.navigation.getParam('id', user.id);
+
         api.get(`/users/${id}`)
             .then(d => this.setState(d));
 
-        api.get(`/stats/${id}`)
-            .then(d => this.setState({...d, loading: false}))
+        return api.get(`/stats/${id}`)
+            .then(d => this.setState(d))
+			.finally(() => this.setState({ loading: false }));
     }
 
 	onSwipeLeft(gestureState) {
@@ -100,8 +101,8 @@ export default class ProfileScreen extends React.Component{
         return (
             <ScrollView vertical={true} style={styles.container} refreshControl={
 				<RefreshControl
-					refreshing={this.state.loading}
-					onRefresh={this.refresh}
+					refreshing={this.state.refreshing}
+					onRefresh={this.refreshData}
 				/>
 			}>
                 <Text style={styles.titleText}>{this.state.user.username}</Text>

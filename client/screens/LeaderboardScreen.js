@@ -17,8 +17,11 @@ export default class LeaderboardScreen extends React.Component {
             sortBy: 'total',
             period: 'last-week',
 			loading: false,
+            refreshing: false,
         };
-        this.fetch = this.fetch.bind(this);
+
+        this.loadData = this.loadData.bind(this);
+        this.refreshData = this.refreshData.bind(this);
     }
 
 	static navigationOptions = {
@@ -26,17 +29,17 @@ export default class LeaderboardScreen extends React.Component {
 	};
 
     componentDidMount() {
-        this.fetch();
+        this.loadData();
 		AppState.addEventListener('change', this.handleAppStateChange);
     }
 
 	handleAppStateChange = nextAppState => {
 		if (nextAppState === 'active') {
-			this.fetch();
+			this.loadData();
 		}
 	};
 
-    fetch(sortBy = this.state.sortBy, period = this.state.period) {
+    loadData(sortBy = this.state.sortBy, period = this.state.period) {
         let d = new Date();
         d.setHours(0, 0, 0);
         if (period === 'last-week') {
@@ -45,15 +48,24 @@ export default class LeaderboardScreen extends React.Component {
             d.setDate(1);
         }
         this.setState({loading: true});
-        api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(d.getTime()/1000)}`)
-            .then(data => this.setState({data, sortBy, period, loading: false}))
+
+        return api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(d.getTime()/1000)}`)
+            .then(data => this.setState({data, sortBy, period}))
+            .catch(err => console.error(err))
+            .finally(() => this.setState({loading: false}));
+    }
+
+    refreshData() {
+        this.setState({ refreshing: true });
+        this.loadData()
+            .finally(() => this.setState({ refreshing: false}));
     }
 
     handlePeriodChange = (newPeriod) => () => {
         const { period } = this.state;
 
         if (newPeriod !== period) {
-            this.fetch(null, newPeriod);
+            this.loadData(null, newPeriod);
         }
     };
 
@@ -61,7 +73,7 @@ export default class LeaderboardScreen extends React.Component {
         const { sortBy } = this.state;
 
         if (clickedColumn !== sortBy) {
-            this.fetch(clickedColumn);
+            this.loadData(clickedColumn);
         }
     };
 
@@ -69,8 +81,8 @@ export default class LeaderboardScreen extends React.Component {
         const { sortBy, data, period } = this.state;
         return (
             <ScrollView style={{ padding: 10 }} vertical={true}  refreshControl={<RefreshControl
-				refreshing={this.state.loading}
-				onRefresh={this.fetch}
+				refreshing={this.state.refreshing}
+				onRefresh={this.refreshData}
 			/>}>
                 <Text style={{ marginTop: 20}}>
                     <Text style={{ fontWeight: 'bold'}}>Show &nbsp;</Text>

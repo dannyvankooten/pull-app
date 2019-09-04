@@ -10,19 +10,16 @@ import {
 
 import api from './../util/api.js';
 import TimeAgo from 'react-native-timeago';
-import auth from "../util/auth";
 
 export default class FeedScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             activities: [],
-            loading: true
+            loading: true,
+            refreshing: false
         };
-        this.refresh = this.refresh.bind(this);
-
-        // auth.setUser(null)
-		// auth.setToken(null);
+        this.refreshData = this.refreshData.bind(this);
     }
 
 	static navigationOptions = {
@@ -30,36 +27,44 @@ export default class FeedScreen extends React.Component {
 	};
 
     componentDidMount() {
-       this.refresh();
+       this.loadData();
        AppState.addEventListener('change', this.handleAppStateChange);
     }
 
 	handleAppStateChange = nextAppState => {
 		if (nextAppState === 'active') {
-			this.refresh();
+			this.loadData();
 		}
 	};
 
-    refresh() {
+    loadData() {
         this.setState({ loading: true });
 
-        api.get('/activities?feed=1&limit=100')
+        return api.get('/activities?feed=1&limit=100')
             .then((activities) => {
                 activities = activities.map(a => {
                     a.date = api.date(a.timestamp);
                     return a;
                 });
-                this.setState({activities, loading: false});
-            });
+                this.setState({activities});
+            })
+            .catch(err => console.error(err))
+            .finally(() => this.setState({ loading: false}));
+    }
+
+    refreshData() {
+        this.setState({ refreshing: true });
+        this.loadData()
+            .finally(() => this.setState({ refreshing: false}));
     }
 
     render() {
         return (
             <View style={styles.container}>
-                <ScrollView contentContainerStyle={styles.contentContainer} refreshControl={
+                <ScrollView refreshControl={
                     <RefreshControl
-                        refreshing={this.state.loading}
-                        onRefresh={this.refresh}
+                        refreshing={this.state.refreshing}
+                        onRefresh={this.refreshData}
                     />
                 }>
 					{this.state.activities.map(a => (
