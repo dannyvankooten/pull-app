@@ -1,4 +1,3 @@
-import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import {
     ScrollView,
@@ -8,52 +7,96 @@ import {
 	RefreshControl
 } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
-const empty = { average: 0, total: 0, biggest: 0 };
 import api from './../util/api.js';
 import Chart from "../components/Chart";
 import auth from "../util/auth";
 
+function initDates(data) {
+	return data.map(d => {
+		if (typeof(d.date) === "string") {
+			d.date = new Date(d.date + 'T00:00:00Z');
+		}
+		return d;
+	});
+}
+
 function Table(props) {
+	const {data, altData, period, title, userName} = props;
+	const stats = (data, since) => {
+		let total = 0, average = 0, biggest = 0;
+		data.forEach(d => {
+			if (d.date >= since) {
+				total += d.total;
+				average += d.average;
+				biggest += d.biggest;
+			}
+		});
+		return {total, average, biggest};
+	};
+
+	let since;
+	const now = new Date();
+	switch(period) {
+		case 'all-time':
+		default:
+			since = new Date(2000, 0, 1);
+			break;
+		case 'last-4-weeks':
+			since = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (4*7));
+			break;
+		case 'this-year':
+			since = new Date(now.getFullYear(), 0, 1);
+			break;
+	}
+
+	const userStats = stats(data, since);
+	const myStats = stats(altData, since);
+
 	return (
 		<View style={{ marginTop: 20}}>
 			<View style={styles.row}>
-				<Text style={styles.headerText}>{props.title}</Text>
+				<Text style={{...styles.headerText, flex: 6}}>{title}</Text>
+				<Text style={{...styles.headerText, flex: 3, color: "#999", fontWeight: "normal"}}>{altData.length ? userName : ''}</Text>
+				<Text style={{...styles.headerText, flex: 3, color: "#999", fontWeight: "normal"}}>{altData.length ? 'You' : ''}</Text>
 			</View>
 			<View style={styles.rowOdd}>
 				<Text style={styles.rowTitleText}>Total</Text>
-				<Text style={styles.rowValueText}>{props.data.total}</Text>
+				<Text style={styles.rowValueText}>{userStats.total}</Text>
+				<Text style={styles.rowValueText}>{altData.length ? myStats.total : ''}</Text>
 			</View>
 			<View style={styles.row}>
 				<Text style={styles.rowTitleText}>Average</Text>
-				<Text style={styles.rowValueText}>{props.data.average}</Text>
+				<Text style={styles.rowValueText}>{userStats.average}</Text>
+				<Text style={styles.rowValueText}>{altData.length ? myStats.average : ''}</Text>
 			</View>
 			<View style={styles.rowOdd}>
 				<Text style={styles.rowTitleText}>Max</Text>
-				<Text style={styles.rowValueText}>{props.data.biggest}</Text>
+				<Text style={styles.rowValueText}>{userStats.biggest}</Text>
+				<Text style={styles.rowValueText}>{altData.length ? myStats.biggest : ''}</Text>
 			</View>
 		</View>
 	)
 }
 
 export default class ProfileScreen extends React.Component{
-    constructor(props) {
-        super(props);
-        this.state = {
-            week: empty,
-            month: empty,
-            year: empty,
-            perDay: [],
-            user: {},
-            chartPeriod: 'week',
-			periodAgo: 0,
-			loading: false,
-			refreshing: false,
-        }
-    }
-
 	static navigationOptions = {
 		title: 'Profile',
 	};
+
+    constructor(props) {
+        super(props);
+        this.state = {
+			loading: false,
+			refreshing: false,
+
+			user: {},
+			chartPeriod: 'week',
+			chartPeriodAgo: 0,
+
+			data: [],
+			altData: []
+		}
+    };
 
     componentDidMount() {
     	this.loadData()
@@ -75,30 +118,35 @@ export default class ProfileScreen extends React.Component{
 	};
 
     loadData() {
-		this.setState({ loading: true,  week: empty, month: empty, year: empty, perDay: [] });
+		this.setState({ loading: true, data: [], altData: [], user: {}});
 		const user = auth.getUser();
 		const id = this.props.navigation.getParam('id', user.id);
 
         api.get(`/users/${id}`)
             .then(d => this.setState(d));
 
-        return api.get(`/stats/${id}`)
-            .then(d => this.setState(d))
+        api.get(`/v1/stats/${id}`)
+            .then(data => this.setState({data: initDates(data)}))
 			.finally(() => this.setState({ loading: false }));
+
+        if (id !== user.id) {
+			api.get(`/v1/stats/${user.id}`)
+				.then(altData => this.setState({altData: initDates(altData)}))
+		}
     }
 
 	onSwipeLeft(gestureState) {
-		const periodAgo = Math.min(0, ++this.state.periodAgo);
-		this.setState({periodAgo});
+		const chartPeriodAgo = Math.min(0, ++this.state.chartPeriodAgo);
+		this.setState({chartPeriodAgo});
 	}
 
 	onSwipeRight(gestureState) {
-		const periodAgo = --this.state.periodAgo;
-		this.setState({periodAgo});
+		const chartPeriodAgo = --this.state.chartPeriodAgo;
+		this.setState({chartPeriodAgo});
 	}
 
     render() {
-    	const { chartPeriod, refreshing, user, perDay } = this.state;
+    	const { chartPeriod, chartPeriodAgo, refreshing, user, data, altData } = this.state;
 
         return (
             <ScrollView vertical={true} style={styles.container} refreshControl={
@@ -108,14 +156,11 @@ export default class ProfileScreen extends React.Component{
 				/>
 			}>
                 <Text style={styles.titleText}>{user.username}</Text>
-
 				<View>
 					<GestureRecognizer
 						onSwipeLeft={(state) => this.onSwipeLeft(state)}
-						onSwipeRight={(state) => this.onSwipeRight(state)}
-						config={{}}
-					>
-						<Chart data={this.state.perDay} period={this.state.chartPeriod} periodAgo={this.state.periodAgo} />
+						onSwipeRight={(state) => this.onSwipeRight(state)}>
+						<Chart data={data} period={chartPeriod} periodAgo={chartPeriodAgo} />
 						<View style={styles.chartPeriods}>
 							<Text style={chartPeriod === 'week' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'week'})}>Week</Text>
 							{/*<Text style={chartPeriod === 'month' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'month'})}>Month</Text> */}
@@ -124,9 +169,9 @@ export default class ProfileScreen extends React.Component{
 					</GestureRecognizer>
 				</View>
 				<View style={{ marginTop: 20}}>
-					<Table title="Last week" data={this.state.week} />
-					<Table title="Last month" data={this.state.month} />
-					<Table title="Last year" data={this.state.year} />
+					<Table title="Last 4 weeks" data={data} altData={altData} period={"last-4-weeks"} userName={user.username}/>
+					<Table title="This year" data={data} altData={altData} period={"this-year"} userName={user.username}/>
+					<Table title="All-time" data={data} altData={altData}  period={"all-time"} userName={user.username} />
 				</View>
             </ScrollView>
         )
@@ -150,8 +195,8 @@ const styles = StyleSheet.create({
 		paddingVertical: 6,
 		paddingHorizontal: 4
 	},
-	rowTitleText: { flex: 3},
-	rowValueText: { flex: 7},
+	rowTitleText: { flex: 6},
+	rowValueText: { flex: 3},
 	chartPeriods: {
 		marginTop: 10,
 		textAlign: 'center',

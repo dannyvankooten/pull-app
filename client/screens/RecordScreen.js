@@ -129,13 +129,15 @@ const styles = StyleSheet.create({
     },
 	button: {
     	width: '100%',
-    	backgroundColor: '#333',
+    	backgroundColor: '#2185d0',
 		paddingVertical: 12,
 		alignItems: 'center',
-		marginTop: 12
+		marginTop: 12,
+        borderRadius: 2,
 	},
 	buttonText: {
-    	color: "#FFF"
+    	color: "#FFF",
+        fontWeight: "700"
 	},
 	mutedText: {
 		color: 'rgba(0,0,0,.4)',

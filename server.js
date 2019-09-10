@@ -121,6 +121,12 @@ app.delete("/api/activities/:id", catcher(async (req, res) => {
     res.json(true)
 }));
 
+app.get('/api/v1/stats/:id', catcher(async (req, res) => {
+    const db = await dbPromise;
+    let data = await db.all('SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest, date(a.timestamp) AS `date` FROM activities a WHERE a.user_id = ? GROUP by date(a.timestamp)', req.params.id);
+    res.json(data)
+}));
+
 app.get('/api/stats/:id', catcher(async (req, res) => {
     const createSql = (dateModifier) => `SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest FROM activities a WHERE timestamp > date("now", "${dateModifier}") AND a.user_id = ?`;
     const db = await dbPromise;

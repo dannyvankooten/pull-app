@@ -11,12 +11,7 @@ const monthNames = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 
 export default function Chart(props) {
         let now = new Date();
-        let rawData = props.data.map(d => {
-            if (typeof(d.date) === "string") {
-                d.date = new Date(d.date + 'T00:00:00Z');
-            }
-            return d;
-        });
+        let rawData = props.data;
         let barData = [];
         const period = props.period || 'week';
         const numberOfBars = {week: 7, month: 5, year: 12}[period];
@@ -61,7 +56,7 @@ export default function Chart(props) {
         const tickFormatters = {
         	week: d => days[d.getDay()],
 			month: d => '',
-			year: d => months[d.getMonth()],
+			year: d => monthNames[d.getMonth()],
 		};
 
         let subtitle;

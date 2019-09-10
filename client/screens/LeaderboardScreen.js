@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
 	},
 	linkText: {
     	margin: 6,
+        paddingVertical: 2,
 		color: '#4183c4'
 	},
 });

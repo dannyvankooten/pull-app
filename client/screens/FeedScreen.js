@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
     },
 	linkText: {
-    	color: '#4183c4'
+    	color: '#4183c4',
+        paddingVertical: 2,
 	},
 	baseText: {
     	fontWeight: "600"
