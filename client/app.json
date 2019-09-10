@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "Pull App",
-    "slug": "pull-app",
+    "name": "Pull-up Game",
+    "slug": "pullup-game",
     "privacy": "public",
     "sdkVersion": "34.0.0",
     "platforms": [
       "ios",
       "android",
-      "web"
     ],
     "version": "1.0.0",
     "orientation": "portrait",
+    "primaryColor": "#2185d0",
     "icon": "./assets/images/icon.png",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -25,12 +25,13 @@
     ],
     "ios": {
       	"supportsTablet": true,
-		"bundleIdentifier": "com.dvko.pullapp"
+		"bundleIdentifier": "com.dvko.pullupgame"
     },
-	  "android": {
-		  "package": "com.dvko.pullapp"
-	  },
-    "description": "",
+	"android": {
+      "package": "com.dvko.pullupgame",
+      "permissions": []
+	},
+    "description": "Compete against your friends doing pull-ups",
     "githubUrl": "https://github.com/dannyvankooten/pull-app"
   }
 }

@@ -23,15 +23,16 @@ function initDates(data) {
 function Table(props) {
 	const {data, altData, period, title, userName} = props;
 	const stats = (data, since) => {
-		let total = 0, average = 0, biggest = 0;
+		let sets = 0, total = 0, average = 0, max = 0;
 		data.forEach(d => {
 			if (d.date >= since) {
+				sets += d.sets;
 				total += d.total;
-				average += d.average;
-				biggest += d.biggest;
+				average = Math.round(total / sets);
+				max = Math.max(max, d.max);
 			}
 		});
-		return {total, average, biggest};
+		return {total, average, max, sets};
 	};
 
 	let since;
@@ -71,8 +72,8 @@ function Table(props) {
 			</View>
 			<View style={styles.rowOdd}>
 				<Text style={styles.rowTitleText}>Max</Text>
-				<Text style={styles.rowValueText}>{userStats.biggest}</Text>
-				<Text style={styles.rowValueText}>{altData.length ? myStats.biggest : ''}</Text>
+				<Text style={styles.rowValueText}>{userStats.max}</Text>
+				<Text style={styles.rowValueText}>{altData.length ? myStats.max : ''}</Text>
 			</View>
 		</View>
 	)

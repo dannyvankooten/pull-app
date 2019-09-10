@@ -123,7 +123,7 @@ app.delete("/api/activities/:id", catcher(async (req, res) => {
 
 app.get('/api/v1/stats/:id', catcher(async (req, res) => {
     const db = await dbPromise;
-    let data = await db.all('SELECT SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS biggest, date(a.timestamp) AS `date` FROM activities a WHERE a.user_id = ? GROUP by date(a.timestamp)', req.params.id);
+    let data = await db.all('SELECT SUM(a.repetitions) AS `total`, COUNT(*) as `sets`, MAX(a.repetitions) AS `max`, date(a.timestamp) AS `date` FROM activities a WHERE a.user_id = ? GROUP by date(a.timestamp)', req.params.id);
     res.json(data)
 }));
 
