@@ -130,7 +130,7 @@ export default class ProfileScreen extends React.Component{
             .then(data => this.setState({data: initDates(data)}))
 			.finally(() => this.setState({ loading: false }));
 
-        if (id !== user.id) {
+        if (user && id !== user.id) {
 			api.get(`/v1/stats/${user.id}`)
 				.then(altData => this.setState({altData: initDates(altData)}))
 		}
