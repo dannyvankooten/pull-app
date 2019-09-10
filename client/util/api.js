@@ -9,7 +9,7 @@ function request(method, path, args) {
             }
         }};
 
-    const base = __DEV__ ? 'http://192.168.1.23:3001/api' : 'https://pull-app.dvk.co/api';
+    const base = __DEV__ ? 'http://192.168.1.59:3001/api' : 'https://pull-app.dvk.co/api';
     return window.fetch(base + path, args)
         .then(r => r.json())
 }

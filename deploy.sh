@@ -13,9 +13,6 @@ REMOTE="$REMOTE_USER@$REMOTE_HOST"
 DIR_DEPLOY="$SERVER_DIR"
 DIR_TEMP="/tmp/pull-app.dvk.co-$DATE"
 
-# Bump version in cache.manifest
-#sed -i.bak "s/Version .*/Version $DATE/g"  client/public/cache.manifest
-
 # copy to local release directory
 echo "-- building application for production"
 mkdir "$DIR_TEMP"
@@ -23,16 +20,17 @@ rsync -r ./ "$DIR_TEMP" --exclude='/.git' --filter="dir-merge,- .gitignore"
 cd "$DIR_TEMP"
 
 # build client assets
-#cd client
-#npm install
-#NODE_ENV=production npm run build
-#sed -i.bak "s/%DATE%/$DATE_NICE/g"  build/index.html
+cd web
+sed -i.bak "s/Version .*/Version $DATE/g"  public/cache.manifest
+npm install
+NODE_ENV=production npm run build
+sed -i.bak "s/%DATE%/$DATE_NICE/g"  build/index.html
 
 # deploy to server
 echo "-- deploying to $REMOTE_HOST"
 
 # uploading application files
-rsync -qru "$DIR_TEMP/." "$REMOTE:$DIR_DEPLOY" --exclude="client/" --no-perms --no-owner --no-group
+rsync -qru "$DIR_TEMP/." "$REMOTE:$DIR_DEPLOY" --exclude="./client" --exclude="./web/node_modules" --exclude="./node_modules" --no-perms --no-owner --no-group
 
 # prepare application & switch symlinks
 echo "-- finalising deployment"

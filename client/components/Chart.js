@@ -4,10 +4,9 @@ import {
     StyleSheet,
 	Text
 } from 'react-native';
-import { VictoryChart, VictoryTheme, VictoryBar, VictoryAxis, VictoryTooltip, VictoryLabel } from "victory-native";
+import { VictoryChart, VictoryTheme, VictoryBar, VictoryAxis } from "victory-native";
 
 const days = [ 'S', 'M', 'T', 'W', 'T', 'F', 'S' ];
-const months = [ 'J', 'F', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 const monthNames = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export default function Chart(props) {

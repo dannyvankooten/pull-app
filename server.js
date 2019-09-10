@@ -45,7 +45,7 @@ app.use(function(req, res, next) {
 });
 
 if (!debug) {
-    app.use(express.static(path.join(__dirname, 'client/build')))
+    app.use(express.static(path.join(__dirname, 'web/build')))
 }
 
 app.get('/api/session', (req, res) => {
@@ -140,7 +140,7 @@ app.get('/api/leaderboard', catcher(async (req, res) => {
 
 if (!debug) {
     app.get('*', (req,res) =>{
-        res.sendFile(path.join(__dirname+'/client/build/index.html'));
+        res.sendFile(path.join(__dirname+'/web/build/index.html'));
     });
 }
 
