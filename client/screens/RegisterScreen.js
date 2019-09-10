@@ -48,6 +48,7 @@ export default class RegisterScreen extends React.Component {
 
 			auth.setUser(user);
 			auth.setToken(user.token);
+			this.props.navigation.navigate("App")
 		}).catch(err => this.setState({error: "Whoops. Something went wrong."}))
 	}
 
@@ -88,7 +89,8 @@ export default class RegisterScreen extends React.Component {
 					onChangeText={(passwordConfirmation) => this.setState({passwordConfirmation})}
 					placeholder='Password (again)'
 					ref='password'
-					returnKeyType='next'
+					blurOnSubmit={true}
+					returnKeyType='done'
 					secureTextEntry={true}
 					style={styles.inputText}
 					value={this.state.passwordConfirmation}

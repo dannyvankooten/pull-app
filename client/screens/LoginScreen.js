@@ -72,7 +72,8 @@ export default class LoginScreen extends React.Component {
                 onChangeText={(password) => this.setState({password})}
                 placeholder='Password'
                 ref='password'
-                returnKeyType='next'
+				blurOnSubmit={true}
+				returnKeyType='done'
                 secureTextEntry={true}
                 style={styles.inputText}
                 value={this.state.password}

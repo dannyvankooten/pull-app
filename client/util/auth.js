@@ -12,12 +12,14 @@ function getToken() {
 	return userToken;
 }
 
-function setToken(token) {
-	return AsyncStorage.setItem("userToken", token);
+function setToken(_token) {
+	userToken = _token;
+	AsyncStorage.setItem("userToken", _token);
 }
 
-function setUser(user) {
-	return AsyncStorage.setItem("user", JSON.stringify(user));
+function setUser(_user) {
+	user = _user;
+	AsyncStorage.setItem("user", JSON.stringify(_user));
 }
 
 function getUser() {
