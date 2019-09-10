@@ -98,14 +98,16 @@ export default class ProfileScreen extends React.Component{
 	}
 
     render() {
+    	const { chartPeriod, refreshing, user, perDay } = this.state;
+
         return (
             <ScrollView vertical={true} style={styles.container} refreshControl={
 				<RefreshControl
-					refreshing={this.state.refreshing}
+					refreshing={refreshing}
 					onRefresh={this.refreshData}
 				/>
 			}>
-                <Text style={styles.titleText}>{this.state.user.username}</Text>
+                <Text style={styles.titleText}>{user.username}</Text>
 
 				<View>
 					<GestureRecognizer
@@ -114,6 +116,11 @@ export default class ProfileScreen extends React.Component{
 						config={{}}
 					>
 						<Chart data={this.state.perDay} period={this.state.chartPeriod} periodAgo={this.state.periodAgo} />
+						<View style={styles.chartPeriods}>
+							<Text style={chartPeriod === 'week' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'week'})}>Week</Text>
+							{/*<Text style={chartPeriod === 'month' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'month'})}>Month</Text> */}
+							<Text style={chartPeriod === 'year' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'year'})}>Year</Text>
+						</View>
 					</GestureRecognizer>
 				</View>
 				<View style={{ marginTop: 20}}>
@@ -145,8 +152,26 @@ const styles = StyleSheet.create({
 	},
 	rowTitleText: { flex: 3},
 	rowValueText: { flex: 7},
+	chartPeriods: {
+		marginTop: 10,
+		textAlign: 'center',
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		flex: 1,
+	},
+	chartPeriod: {
+		color: '#AAA',
+		fontSize: 12,
+		marginRight: 4,
+		padding: 2,
+	},
 });
 styles.rowOdd = {
 	...styles.row,
 	backgroundColor: 'rgba(0,0,0,.02)',
+};
+styles.chartPeriodActive = {
+	...styles.chartPeriod,
+	textDecorationLine: 'underline',
 };

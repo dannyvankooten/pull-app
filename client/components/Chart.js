@@ -19,26 +19,28 @@ export default function Chart(props) {
         });
         let barData = [];
         const period = props.period || 'week';
-        const numberOfBars = period === 'week' ? 7 : 12;
+        const numberOfBars = {week: 7, month: 5, year: 12}[period];
 
         for(let i = numberOfBars; i > 0; i--) {
             let iStart = new Date();
-            iStart.setHours(0);
-            iStart.setMinutes(0);
+            iStart.setHours(0, 0, 0);
 
-            if (period === 'month') {
-                iStart.setMonth(now.getMonth() - 1);
-                iStart.setDate(1);
-            } else {
-                iStart.setDate(now.getDate() + (8 - iStart.getDay()) + (props.periodAgo * 7)); // set to Monday
-                iStart.setDate(iStart.getDate() - i);
+            if (period === 'week') {
+				iStart.setDate(now.getDate() + (8 - iStart.getDay()) + (props.periodAgo * 7) - i);
+            } else if (period === 'month') {
+				iStart.setDate(now.getDate() + (8 - iStart.getDay()) + (props.periodAgo * 7 * 5) - i * 7);
+			} else if (period === 'year') {
+				iStart.setDate(1);
+				iStart.setMonth(now.getMonth() + (12 - now.getMonth()) + ( props.periodAgo * 12 ) - i);
             }
 
             let iEnd = new Date(iStart);
-            if (period === 'month') {
-                iEnd.setMonth(iStart.getMonth() + 1);
-            } else {
-                iEnd.setDate(iStart.getDate() + 1);
+            if (period === 'week') {
+				iEnd.setDate(iStart.getDate() + 1);
+			} else if(period === 'month') {
+            	iEnd.setDate(iStart.getDate() + 7);
+            } else if(period === 'year') {
+				iEnd.setMonth(iStart.getMonth() + 1);
             }
 
             let total = 0;
@@ -56,6 +58,19 @@ export default function Chart(props) {
         const startDate = barData[0].x;
         const endDate = barData[barData.length-1].x;
 
+        const tickFormatters = {
+        	week: d => days[d.getDay()],
+			month: d => '',
+			year: d => months[d.getMonth()],
+		};
+
+        let subtitle;
+        if (period === 'week') {
+			subtitle = `${monthNames[startDate.getMonth()]} ${startDate.getDate()} - ${monthNames[endDate.getMonth()]} ${endDate.getDate()}`
+		} else {
+			subtitle = `${monthNames[startDate.getMonth()]} ${startDate.getDate()} - ${monthNames[endDate.getMonth()]} ${endDate.getDate()}, ${startDate.getFullYear()}`
+		}
+
         return (
             <View>
                 <VictoryChart
@@ -67,10 +82,10 @@ export default function Chart(props) {
                     height={200}
                     padding={{ top: 20, bottom: 40, left: 0, right: 40 }}
                     domainPadding={10}>
-                    <VictoryAxis tickValues={barData.map(v => v.x)} tickFormat={d => days[d.getDay()]} />
+                    <VictoryAxis tickValues={barData.map(v => v.x)} tickFormat={tickFormatters[period]} />
                     <VictoryBar data={barData} labels={({ datum }) => datum.y > 0 ? String(Math.round(datum.y)) : ''} />
                 </VictoryChart>
-				<Text style={styles.muted}>{monthNames[startDate.getMonth()]} {startDate.getDate()} - {monthNames[endDate.getMonth()]} {endDate.getDate()}</Text>
+				<Text style={styles.muted}>{subtitle}</Text>
             </View>
         )
 }
