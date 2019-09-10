@@ -60,7 +60,7 @@ class App extends React.Component {
                              <Route path="/" exact render={props => <Track user={this.state.user} />}  />
                              <Route path="/feed" exact component={Feed} />
                              <Route path="/leaderboard/:period?" component={Leaderboard} />
-                             <Route path="/athlete/:id" component={Profile} />
+                             <Route path="/athlete/:id" render={props => <Profile user={this.state.user} {...props} />} />
                              <Route path="/login" exact render={props => <Login onSuccess={this.onLogin} />} />
                              <Route path="/register" exact render={props => <Register onSuccess={this.onLogin} />} />
                              <Route component={NotFound} />
