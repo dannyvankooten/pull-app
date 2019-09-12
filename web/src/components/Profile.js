@@ -63,7 +63,7 @@ function Table(props) {
 			<tr>
 				<td>Average per set</td>
 				<td>{userStats.average}</td>
-				<td>{comparing ? myStats.total : ''}</td>
+				<td>{comparing ? myStats.average : ''}</td>
 			</tr>
 			<tr>
 				<td>Biggest set</td>
