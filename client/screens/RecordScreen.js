@@ -6,7 +6,8 @@ import {
     Text,
     View,
 	TouchableOpacity,
-    AsyncStorage
+    AsyncStorage,
+	Alert
 } from 'react-native';
 import TimeAgo from 'react-native-timeago';
 import api from "../util/api.js";
@@ -57,18 +58,18 @@ export default class RecordScreen extends React.Component {
             repetitions: this.state.reps
         }).then((activity) => {
             activity.date = api.date(activity.timestamp);
-
             this.setState({
                 activities: [activity, ...this.state.activities],
-                loading: false,
             })
-        });
+        }).catch(error => Alert.alert("Uh oh", "Something went wrong saving your effort.. Please try again later."))
+		  .finally(() => this.setState({loading: false}));
     }
 
     render() {
+    	const {error, activities, reps, loading} = this.state;
 		return (
 			<View>
-				{this.state.error ? <View style={styles.errorView}><Text style={styles.errorText}>Network error. Could not load recent activity.</Text></View> : null}
+				{error ? <View style={styles.errorView}><Text style={styles.errorText}>Network error. Could not load recent activity.</Text></View> : null}
 				<View style={styles.container}>
 					<View style={styles.formContainer}>
 						<View style={styles.controlView}>
@@ -76,19 +77,19 @@ export default class RecordScreen extends React.Component {
 									<Text style={styles.controlText} onPress={e => this.setState({reps: Math.max(1, --this.state.reps) })}> - </Text>
 								</View>
 								<View>
-									<Text style={styles.repText}>{this.state.reps}</Text>
+									<Text style={styles.repText}>{reps}</Text>
 									<Text style={styles.mutedText}>repetitions</Text>
 								</View>
 								<View><Text style={styles.controlText} onPress={e => this.setState({reps: Math.min(100, ++this.state.reps) })}> + </Text></View>
 						</View>
 						<TouchableOpacity onPress={this.save} style={styles.button}>
-							<Text style={styles.buttonText}>{this.state.loading ? "Wait" : "Save"}</Text>
+							<Text style={styles.buttonText}>{loading ? "Wait" : "Save"}</Text>
 						</TouchableOpacity>
 					</View>
 					<View style={{ marginTop: 20}}>
-						<View style={{ borderBottomWidth: 1, borderBottomColor: "#efefef",  marginBottom: 6, paddingBottom: 6}}><Text style={{fontSize: 16, fontWeight: "bold"}}>History</Text></View>
+						<View style={styles.titleView}><Text style={styles.titleText}>History</Text></View>
 						<ScrollView vertical={true}>
-						{this.state.activities.map(a => (
+						{activities.length > 0 ? activities.map(a => (
 							<View key={a.id} style={{ marginBottom: 4}}>
 								<Text>
 									<Text>You</Text>
@@ -98,7 +99,7 @@ export default class RecordScreen extends React.Component {
 									<TimeAgo time={a.date} style={styles.mutedText} />
 								</Text>
 							</View>
-						))}
+						)) : <Text>Nothing here, yet.</Text>}
 						</ScrollView>
 					</View>
 				</View>
@@ -110,9 +111,8 @@ export default class RecordScreen extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#fff',
-		padding: 15,
-    },
+		padding: 12
+	},
     controlView: {
     	flexDirection: 'row',
 		alignItems: 'center',
@@ -149,14 +149,19 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		fontWeight: 'normal',
 	},
+	titleView: {
+		borderBottomWidth: 1, borderBottomColor: "#efefef",  marginBottom: 6, paddingBottom: 6
+	},
+	titleText: {
+		fontSize: 16, fontWeight: "bold"
+	},
 	errorView: {
-		margin: 6,
+		margin: 12,
 		padding: 6,
 		backgroundColor: "#fff6f6",
 		borderColor: "#e0b4b4",
 		borderWidth: 1,
 		borderRadius: 2,
-
 	},
 	errorText: {
 		color: "#9f3a38"

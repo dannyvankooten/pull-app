@@ -94,10 +94,7 @@ export default class LoginScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    flexDirection: 'column',
-    backgroundColor: '#fff',
-    padding: 20,
+    padding: 12,
   },
   form: {
     alignItems: 'flex-start',

@@ -116,7 +116,9 @@ export default class LeaderboardScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-	container: { paddingHorizontal: 12, paddingVertical: 6},
+	container: {
+		padding: 12
+	},
     head: {
 		flexDirection: 'row',
 	},
@@ -150,7 +152,7 @@ const styles = StyleSheet.create({
 		color: '#4183c4'
 	},
 	errorView: {
-		margin: 6,
+		margin: 12,
 		padding: 6,
 		backgroundColor: "#fff6f6",
 		borderColor: "#e0b4b4",

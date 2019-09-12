@@ -59,16 +59,17 @@ export default class FeedScreen extends React.Component {
     }
 
     render() {
+    	const { error, activities, refreshing } = this.state;
         return (
             <View>
-				{this.state.error ? <View style={styles.errorView}><Text style={styles.errorText}>Network error. Could not load feed.</Text></View> : null}
+				{error ? <View style={styles.errorView}><Text style={styles.errorText}>Network error. Could not load feed.</Text></View> : null}
                 <ScrollView style={styles.container} refreshControl={
                     <RefreshControl
-                        refreshing={this.state.refreshing}
+                        refreshing={refreshing}
                         onRefresh={this.refreshData}
                     />
                 }>
-					{this.state.activities.map(a => (
+					{activities.length > 0 ? activities.map(a => (
 						<View key={a.id} style={{ padding: 3 }}>
 						<Text style={styles.baseText}>
 							<Text style={styles.linkText} onPress={() => this.props.navigation.push("Profile", { id: a.user_id })}>{a.username}</Text>
@@ -76,7 +77,7 @@ export default class FeedScreen extends React.Component {
 							<TimeAgo time={a.date} interval={60000} style={styles.mutedText}/>
 						</Text>
 						</View>
-					))}
+					)) : <Text>It's so quiet here.</Text>}
                 </ScrollView>
             </View>
         )
@@ -84,7 +85,9 @@ export default class FeedScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-	container: { paddingHorizontal: 12, paddingVertical: 6},
+	container: {
+		padding: 12
+	},
     titleText: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -103,7 +106,7 @@ const styles = StyleSheet.create({
 		fontWeight: 'normal',
 	},
 	errorView: {
-    	margin: 6,
+		margin: 12,
 		padding: 6,
     	backgroundColor: "#fff6f6",
 		borderColor: "#e0b4b4",
