@@ -18,6 +18,7 @@ export default class LeaderboardScreen extends React.Component {
             period: 'last-week',
 			loading: false,
             refreshing: false,
+			error: null,
         };
 
         this.loadData = this.loadData.bind(this);
@@ -47,11 +48,11 @@ export default class LeaderboardScreen extends React.Component {
         } else {
             d.setDate(1);
         }
-        this.setState({loading: true});
+        this.setState({loading: true, error: null});
 
         return api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(d.getTime()/1000)}`)
             .then(data => this.setState({data, sortBy, period}))
-            .catch(err => console.error(err))
+            .catch(error => this.setState({error}))
             .finally(() => this.setState({loading: false}));
     }
 
@@ -80,38 +81,42 @@ export default class LeaderboardScreen extends React.Component {
     render() {
         const { sortBy, data, period } = this.state;
         return (
-            <ScrollView style={{ padding: 10 }} vertical={true}  refreshControl={<RefreshControl
-				refreshing={this.state.refreshing}
-				onRefresh={this.refreshData}
-			/>}>
-                <Text style={{ marginTop: 20}}>
-                    <Text style={{ fontWeight: 'bold'}}>Show &nbsp;</Text>
-                    <Text onPress={this.handlePeriodChange('last-week')} style={{color: '#888', fontWeight: period === 'last-week' ? 'bold' : 'normal'}}>last week</Text>
-                    &nbsp;
-                    <Text onPress={this.handlePeriodChange('last-month')} style={{color: '#888', fontWeight: period === 'last-month' ? 'bold' : 'normal'}}>last month</Text>
-                </Text>
-                <View style={styles.tableWrap}>
-					<View style={styles.head}>
-						<View style={{...styles.headerCell, flex: 1.25}}><Text style={styles.headerText}>#</Text></View>
-						<View style={{...styles.headerCell, flex: 4}}><Text style={styles.headerText}>Athlete</Text></View>
-						<View style={{...styles.headerCell, flex: 2}}><Text style={styles.headerText} onPress={this.handleSort('total')}>Total</Text></View>
-						<View style={{...styles.headerCell, flex: 2}}><Text style={styles.headerText} onPress={this.handleSort('max')}>Max</Text></View>
-					</View>
-					{data.map((u, index) => (
-						<View key={index} style={styles.row}>
-							<View style={{...styles.rowCell,  flex: 1.25}}><Text style={styles.text}>{index+1}</Text></View>
-							<View style={{...styles.rowCell, flex: 4}}><Text style={styles.linkText} onPress={() => this.props.navigation.push('Profile', { id: u.id })}>{u.username}</Text></View>
-							<View style={{...styles.rowCell, flex: 2}}><Text style={styles.text}>{u.total}</Text></View>
-							<View style={{...styles.rowCell, flex: 2}}><Text style={styles.text}>{u.max}</Text></View>
+        	<View>
+				{this.state.error ? <View style={styles.errorView}><Text style={styles.errorText}>Network error. Could not load leaderboard.</Text></View> : null}
+				<ScrollView style={styles.container} vertical={true}  refreshControl={<RefreshControl
+					refreshing={this.state.refreshing}
+					onRefresh={this.refreshData}
+				/>}>
+					<Text style={{ marginTop: 20}}>
+						<Text style={{ fontWeight: 'bold'}}>Show &nbsp;</Text>
+						<Text onPress={this.handlePeriodChange('last-week')} style={{color: '#888', fontWeight: period === 'last-week' ? 'bold' : 'normal'}}>last week</Text>
+						&nbsp;
+						<Text onPress={this.handlePeriodChange('last-month')} style={{color: '#888', fontWeight: period === 'last-month' ? 'bold' : 'normal'}}>last month</Text>
+					</Text>
+					<View style={styles.tableWrap}>
+						<View style={styles.head}>
+							<View style={{...styles.headerCell, flex: 1.25}}><Text style={styles.headerText}>#</Text></View>
+							<View style={{...styles.headerCell, flex: 4}}><Text style={styles.headerText}>Athlete</Text></View>
+							<View style={{...styles.headerCell, flex: 2}}><Text style={styles.headerText} onPress={this.handleSort('total')}>Total</Text></View>
+							<View style={{...styles.headerCell, flex: 2}}><Text style={styles.headerText} onPress={this.handleSort('max')}>Max</Text></View>
 						</View>
-					))}
-                </View>
-            </ScrollView>
+						{data.map((u, index) => (
+							<View key={index} style={styles.row}>
+								<View style={{...styles.rowCell,  flex: 1.25}}><Text style={styles.text}>{index+1}</Text></View>
+								<View style={{...styles.rowCell, flex: 4}}><Text style={styles.linkText} onPress={() => this.props.navigation.push('Profile', { id: u.id })}>{u.username}</Text></View>
+								<View style={{...styles.rowCell, flex: 2}}><Text style={styles.text}>{u.total}</Text></View>
+								<View style={{...styles.rowCell, flex: 2}}><Text style={styles.text}>{u.max}</Text></View>
+							</View>
+						))}
+					</View>
+				</ScrollView>
+			</View>
         )
     }
 }
 
 const styles = StyleSheet.create({
+	container: { paddingHorizontal: 12, paddingVertical: 6},
     head: {
 		flexDirection: 'row',
 	},
@@ -143,5 +148,16 @@ const styles = StyleSheet.create({
     	margin: 6,
         paddingVertical: 2,
 		color: '#4183c4'
+	},
+	errorView: {
+		margin: 6,
+		padding: 6,
+		backgroundColor: "#fff6f6",
+		borderColor: "#e0b4b4",
+		borderWidth: 1,
+		borderRadius: 2,
+	},
+	errorText: {
+		color: "#9f3a38"
 	},
 });

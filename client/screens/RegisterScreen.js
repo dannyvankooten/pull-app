@@ -49,7 +49,7 @@ export default class RegisterScreen extends React.Component {
 			auth.setUser(user);
 			auth.setToken(user.token);
 			this.props.navigation.navigate("App")
-		}).catch(err => this.setState({error: "Whoops. Something went wrong."}))
+		}).catch(error => this.setState({error: "Whoops. Something went wrong."}))
 	}
 
 

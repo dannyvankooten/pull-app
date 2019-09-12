@@ -89,6 +89,7 @@ export default class ProfileScreen extends React.Component{
         this.state = {
 			loading: false,
 			refreshing: false,
+			error: null,
 
 			user: {},
 			chartPeriod: 'week',
@@ -119,19 +120,22 @@ export default class ProfileScreen extends React.Component{
 	};
 
     loadData() {
-		this.setState({ loading: true, data: [], altData: [], user: {}});
+		this.setState({ loading: true, data: [], altData: [], user: {}, error: null});
 		const user = auth.getUser();
 		const id = this.props.navigation.getParam('id', user.id);
 
         api.get(`/users/${id}`)
+			.catch(error => this.setState({error}))
             .then(d => this.setState(d));
 
         api.get(`/v1/stats/${id}`)
             .then(data => this.setState({data: initDates(data)}))
+			.catch(error => this.setState({error}))
 			.finally(() => this.setState({ loading: false }));
 
         if (user && id !== user.id) {
 			api.get(`/v1/stats/${user.id}`)
+				.catch(error => null)
 				.then(altData => this.setState({altData: initDates(altData)}))
 		}
     }
@@ -150,38 +154,35 @@ export default class ProfileScreen extends React.Component{
     	const { chartPeriod, chartPeriodAgo, refreshing, user, data, altData } = this.state;
 
         return (
-            <ScrollView vertical={true} style={styles.container} refreshControl={
-				<RefreshControl
-					refreshing={refreshing}
-					onRefresh={this.refreshData}
-				/>
-			}>
-                <Text style={styles.titleText}>{user.username}</Text>
-				<View>
-					<GestureRecognizer
-						onSwipeLeft={(state) => this.onSwipeLeft(state)}
-						onSwipeRight={(state) => this.onSwipeRight(state)}>
-						<Chart data={data} period={chartPeriod} periodAgo={chartPeriodAgo} />
-						<View style={styles.chartPeriods}>
-							<Text style={chartPeriod === 'week' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'week'})}>Week</Text>
-							{/*<Text style={chartPeriod === 'month' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'month'})}>Month</Text> */}
-							<Text style={chartPeriod === 'year' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'year'})}>Year</Text>
-						</View>
-					</GestureRecognizer>
-				</View>
-				<View style={{ marginTop: 20}}>
-					<Table title="Last 4 weeks" data={data} altData={altData} period={"last-4-weeks"} userName={user.username}/>
-					<Table title="This year" data={data} altData={altData} period={"this-year"} userName={user.username}/>
-					<Table title="All-time" data={data} altData={altData}  period={"all-time"} userName={user.username} />
-				</View>
-            </ScrollView>
+        	<View>
+				{this.state.error ? <View style={styles.errorView}><Text style={styles.errorText}>Network error. Could not load profile.</Text></View> : null}
+				<ScrollView vertical={true} style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={this.refreshData} />}>
+					<Text style={styles.titleText}>{user.username}</Text>
+					<View>
+						<GestureRecognizer
+							onSwipeLeft={(state) => this.onSwipeLeft(state)}
+							onSwipeRight={(state) => this.onSwipeRight(state)}>
+							<Chart data={data} period={chartPeriod} periodAgo={chartPeriodAgo} />
+							<View style={styles.chartPeriods}>
+								<Text style={chartPeriod === 'week' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'week'})}>Week</Text>
+								{/*<Text style={chartPeriod === 'month' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'month'})}>Month</Text> */}
+								<Text style={chartPeriod === 'year' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'year'})}>Year</Text>
+							</View>
+						</GestureRecognizer>
+					</View>
+					<View style={{ marginTop: 20}}>
+						<Table title="Last 4 weeks" data={data} altData={altData} period={"last-4-weeks"} userName={user.username}/>
+						<Table title="This year" data={data} altData={altData} period={"this-year"} userName={user.username}/>
+						<Table title="All-time" data={data} altData={altData}  period={"all-time"} userName={user.username} />
+					</View>
+            	</ScrollView>
+			</View>
         )
     }
 }
 const styles = StyleSheet.create({
-	container: {
-		padding: 15,
-	},
+	container: { paddingHorizontal: 12, paddingVertical: 8},
+
 	titleText: {
 		fontWeight: 'bold',
 		fontSize: 26,
@@ -211,6 +212,18 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		marginRight: 4,
 		padding: 2,
+	},
+	errorView: {
+		margin: 6,
+		padding: 6,
+		backgroundColor: "#fff6f6",
+		borderColor: "#e0b4b4",
+		borderWidth: 1,
+		borderRadius: 2,
+
+	},
+	errorText: {
+		color: "#9f3a38"
 	},
 });
 styles.rowOdd = {

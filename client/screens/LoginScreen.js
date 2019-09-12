@@ -46,7 +46,7 @@ export default class LoginScreen extends React.Component {
         	auth.setUser(u);
         	auth.setToken(u.token);
           	this.props.navigation.navigate("App")
-        })
+		}).catch(error => this.setState({error: "Whoops. Something went wrong."}))
   }
 
   render() {

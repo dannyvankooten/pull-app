@@ -38,7 +38,7 @@ export default class FeedScreen extends React.Component {
 	};
 
     loadData() {
-        this.setState({ loading: true });
+        this.setState({ loading: true, error: null });
 
         return api.get('/activities?feed=1&limit=100')
             .then((activities) => {
@@ -48,7 +48,7 @@ export default class FeedScreen extends React.Component {
                 });
                 this.setState({activities});
             })
-            .catch(err => console.error(err))
+            .catch(err => this.setState({error: err}))
             .finally(() => this.setState({ loading: false}));
     }
 
@@ -60,8 +60,9 @@ export default class FeedScreen extends React.Component {
 
     render() {
         return (
-            <View style={styles.container}>
-                <ScrollView refreshControl={
+            <View>
+				{this.state.error ? <View style={styles.errorView}><Text style={styles.errorText}>Network error. Could not load feed.</Text></View> : null}
+                <ScrollView style={styles.container} refreshControl={
                     <RefreshControl
                         refreshing={this.state.refreshing}
                         onRefresh={this.refreshData}
@@ -83,9 +84,7 @@ export default class FeedScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        padding: 15,
-    },
+	container: { paddingHorizontal: 12, paddingVertical: 6},
     titleText: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -102,5 +101,16 @@ const styles = StyleSheet.create({
     	color: 'rgba(0,0,0,.4)',
 		fontSize: 12,
 		fontWeight: 'normal',
-	}
+	},
+	errorView: {
+    	margin: 6,
+		padding: 6,
+    	backgroundColor: "#fff6f6",
+		borderColor: "#e0b4b4",
+		borderWidth: 1,
+		borderRadius: 2,
+	},
+	errorText: {
+    	color: "#9f3a38"
+	},
 });
