@@ -1,6 +1,7 @@
 # data
 database.sqlite
 sessions
+.expo
 
 # dependencies
 /node_modules
