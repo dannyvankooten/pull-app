@@ -86,22 +86,14 @@ class Track extends React.Component {
             <table className={"margin-s"}>
                 <tbody>
                 <tr>
-                    <td onMouseDown={(evt) => {
-                        evt.preventDefault();
-                        let count = Math.max(1, count - 1);
-                        this.setState({count})}
-                    }>
+                    <td onMouseDown={() => this.setState({count: Math.max(1, count - 1)})}>
                         <span className="control">-</span>
                     </td>
                     <td onMouseDown={evt => evt.preventDefault()}>
                         <span className="count" onClick={evt => evt.preventDefault()}>{count}</span><br />
                         <small className="muted">repetitions</small>
                     </td>
-                    <td onMouseDown={(evt) => {
-                        evt.preventDefault();
-                        let count = count + 1;
-                        this.setState({count})}
-                    }>
+                    <td onMouseDown={() => this.setState({count: count + 1})}>
                         <span className="control">+</span>
                     </td>
                 </tr>
