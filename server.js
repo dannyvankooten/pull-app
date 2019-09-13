@@ -32,7 +32,7 @@ const catcher = fn => (req, res, next) => {
 const dbPromise = Promise.resolve()
     .then(() => sqlite.open('./database.sqlite', { Promise }))
     .then(db => db.migrate())
-    .then(db => db.run('PRAGMA foreign_keys = ON'));
+    .then(db => db.exec('PRAGMA foreign_keys = ON'));
 
 app.use(function(req, res, next) {
     if(debug) {
