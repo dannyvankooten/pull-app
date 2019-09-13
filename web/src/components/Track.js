@@ -26,7 +26,7 @@ class Track extends React.Component {
         return a;
       });
       this.setState({activities})
-    })
+    }).catch(error => this.setState({error}))
   }
 
   confirmDeletion (activity) {
@@ -50,32 +50,36 @@ class Track extends React.Component {
   }
 
   save(evt) {
+    const {count, activities, disabled} = this.state;
+
     this.setState({
         loading: true,
-        disabled: this.state.count * 3
+        disabled: count * 3
     });
-    localStorage.setItem('repetitions', this.state.count);
+    localStorage.setItem('repetitions', count);
 
     api.post('/activities', {
-    	repetitions: this.state.count
+    	repetitions: count
     }).then((activity) => {
     	activity.date = api.date(activity.timestamp);
-
         this.setState({
-           activities: [activity, ...this.state.activities],
-           loading: false,
+           activities: [activity, ...activities],
         })
-      });
+      }).catch(error => this.setState({error}))
+        .finally(() => this.setState({loading: false}));
 
     let interval = window.setInterval(() => {
-        this.setState({ disabled: this.state.disabled - 1 });
-        if (this.state.disabled <= 0) {
+        this.setState({ disabled: disabled - 1 });
+
+        if (disabled <= 0) {
             window.clearInterval(interval);
         }
     }, 1000);
   }
 
   render() {
+    const { count, disabled, activities, loading } = this.state;
+
     return (<div className="track">
         <div className={"margin-l"} >
             <div className="track-count">
@@ -84,18 +88,18 @@ class Track extends React.Component {
                 <tr>
                     <td onMouseDown={(evt) => {
                         evt.preventDefault();
-                        let count = Math.max(1, this.state.count - 1);
+                        let count = Math.max(1, count - 1);
                         this.setState({count})}
                     }>
                         <span className="control">-</span>
                     </td>
                     <td onMouseDown={evt => evt.preventDefault()}>
-                        <span className="count" onClick={evt => evt.preventDefault()}>{this.state.count}</span><br />
+                        <span className="count" onClick={evt => evt.preventDefault()}>{count}</span><br />
                         <small className="muted">repetitions</small>
                     </td>
                     <td onMouseDown={(evt) => {
                         evt.preventDefault();
-                        let count = this.state.count + 1;
+                        let count = count + 1;
                         this.setState({count})}
                     }>
                         <span className="control">+</span>
@@ -105,12 +109,12 @@ class Track extends React.Component {
             </table>
           </div>
           <div>
-              <Button fluid size='big' onClick={this.save} primary disabled={!!this.state.disabled} loading={this.state.loading} >{this.state.disabled > 0 ? `Wait ${this.state.disabled}s` : `Save`}</Button>
+              <Button fluid size='big' onClick={this.save} primary disabled={!!disabled} loading={loading} >{disabled > 0 ? `Wait ${disabled}s` : `Save`}</Button>
           </div>
        </div>
        <Divider horizontal>History</Divider>
         <Feed>
-            {this.state.activities.map(a => (
+            {activities.map(a => (
                     <Feed.Event onTouchStart={() => this.confirmDeletion(a)}
                                 onTouchEnd={this.cancelDeletion}
                                 onMouseDown={() => this.confirmDeletion(a)}

@@ -24,6 +24,7 @@ class Register extends React.Component {
 			username: form.username.value,
 			password: form.password.value,
 			passwordConfirmation: form.password_confirmation.value,
+			email: form.email.value, // honeypot
 		}).then(user => {
 			if (!user || user.error) {
 				this.setState({error: user.error || "Whoops. Something went wrong."});
@@ -39,6 +40,7 @@ class Register extends React.Component {
 		<div>
 			<h1>Register</h1>
 			<Form onSubmit={this.submit}>
+				<div style={{ display: 'none' }}><Form.Input fluid name={"email"} type="text"  label='Email' placeholder='Enter your email address' htmlFor="register-email" id={"register-email"} /></div>
 				<Form.Input name={"username"} fluid type="text" label='Username' placeholder='Enter your username' required minLength="2" maxLength="36" htmlFor="register-username" id={"register-username"} />
 				<Form.Input name={"password"} fluid type="password" label='Password' placeholder='Enter your password' required minLength="6" maxLength="72" htmlFor={"register-password"} id={"register-password"} />
 				<Form.Input name={"password_confirmation"} fluid type="password" label='Confirm password' placeholder='Enter your password (again)' minLength="6" maxLength="72" required htmlFor={"register-password-confirmation"} id={"register-password-confirmation"} />

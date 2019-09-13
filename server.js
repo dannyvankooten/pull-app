@@ -77,6 +77,12 @@ app.post('/api/login', catcher(async(req, res) => {
 
 app.post('/api/register', catcher(async(req, res) => {
     const db = await dbPromise;
+
+    // "email" is name of honeypot field.
+    if (req.body.email) {
+        return res.json({ error: "You seem to be a bot. Request denied, sorry."});
+    }
+
     let exists = await db.get('SELECT * FROM users WHERE LOWER(username) = ? LIMIT 1', req.body.username.toLowerCase());
     if (exists) {
         return res.json({ error: "That username is taken, sorry."})

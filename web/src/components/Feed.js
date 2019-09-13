@@ -21,7 +21,7 @@ class Feed extends React.Component {
         return a;
       });
       this.setState({activities})
-    })
+    }).catch(error => this.setState({error}))
   }
 
   render() {

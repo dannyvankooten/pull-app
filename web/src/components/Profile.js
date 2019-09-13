@@ -98,12 +98,14 @@ class Profile extends React.Component {
 
 	fetch() {
 		api.get(`/users/${this.props.match.params.id}`)
-			.then(d => this.setState(d));
+			.then(d => this.setState(d))
+			.catch(error => this.setState({error}));
 
 		api.get(`/v1/stats/${this.props.match.params.id}`)
 			.then(d => this.setState({data: initDates(d)}))
+			.catch(error => this.setState({error}));
 
-		if (this.props.match.params.id != this.props.user.id) {
+		if (this.props.match.params.id !== this.props.user.id) {
 			api.get(`/v1/stats/${this.props.user.id}`)
 				.then(d => this.setState({altData: initDates(d)}))
 		}

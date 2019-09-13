@@ -36,6 +36,7 @@ export default class Feed extends React.Component {
         }
         api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(d.getTime()/1000)}`)
             .then(data => this.setState({data, sortBy}))
+            .catch(error => this.setState({error}))
     }
 
     handleSort = (clickedColumn) => () => {
