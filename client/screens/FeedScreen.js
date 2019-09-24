@@ -63,7 +63,7 @@ export default class FeedScreen extends React.Component {
         return (
             <View>
 				{error ? <View style={styles.errorView}><Text style={styles.errorText}>Network error. Could not load feed.</Text></View> : null}
-                <ScrollView style={styles.container} refreshControl={
+                <ScrollView contentContainerStyle={styles.container} refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={this.refreshData}

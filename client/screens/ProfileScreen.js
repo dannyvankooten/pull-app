@@ -156,7 +156,7 @@ export default class ProfileScreen extends React.Component{
         return (
         	<View>
 				{this.state.error ? <View style={styles.errorView}><Text style={styles.errorText}>Network error. Could not load profile.</Text></View> : null}
-				<ScrollView vertical={true} style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={this.refreshData} />}>
+				<ScrollView vertical={true} contentContainerStyle={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={this.refreshData} />}>
 					<Text style={styles.titleText}>{user.username}</Text>
 					<View>
 						<GestureRecognizer

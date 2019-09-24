@@ -8,6 +8,18 @@ import {
 	AppState
 } from 'react-native';
 import api from './../util/api.js';
+import GestureRecognizer from 'react-native-swipe-gestures';
+
+function formatDate(d, includeYear = false) {
+	const monthNames = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	let s = monthNames[d.getMonth()] + " " + d.getDate();
+
+	if (includeYear) {
+		s = s + ", " + d.getFullYear();
+	}
+
+	return s;
+}
 
 export default class LeaderboardScreen extends React.Component {
     constructor(props) {
@@ -16,9 +28,12 @@ export default class LeaderboardScreen extends React.Component {
             data: [],
             sortBy: 'total',
             period: 'last-week',
+			timeDiff: 0,
 			loading: false,
             refreshing: false,
 			error: null,
+			start: new Date(),
+			end: new Date(),
         };
 
         this.loadData = this.loadData.bind(this);
@@ -41,17 +56,24 @@ export default class LeaderboardScreen extends React.Component {
 	};
 
     loadData(sortBy = this.state.sortBy, period = this.state.period) {
-        let d = new Date();
-        d.setHours(0, 0, 0);
+        let start = new Date();
+		start.setHours(0, 0, 0);
+		let end;
         if (period === 'last-week') {
-            d.setDate(d.getDate() - d.getDay());
+			start.setDate(start.getDate() - start.getDay() + 1 + (this.state.timeDiff * 7)); // set to Monday
+			end = new Date(start);
+			end.setDate(start.getDate() + 7);
         } else {
-            d.setDate(1);
+			start.setDate(1);
+			start.setMonth(start.getMonth() + this.state.timeDiff);
+			end = new Date(start);
+			end.setMonth(start.getMonth() + 1);
         }
+        end.setMinutes(-1);
         this.setState({loading: true, error: null});
 
-        return api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(d.getTime()/1000)}`)
-            .then(data => this.setState({data, sortBy, period}))
+        return api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(start.getTime()/1000)}&before=${Math.round(end.getTime()/1000)}`)
+            .then(data => this.setState({data, sortBy, period, start, end}))
             .catch(error => this.setState({error}))
             .finally(() => this.setState({loading: false}));
     }
@@ -78,37 +100,55 @@ export default class LeaderboardScreen extends React.Component {
         }
     };
 
+
+	onSwipeLeft(gestureState) {
+		const timeDiff = Math.min(0, ++this.state.timeDiff);
+		this.setState({timeDiff}, this.loadData);
+	}
+
+	onSwipeRight(gestureState) {
+		const timeDiff = --this.state.timeDiff;
+		this.setState({timeDiff}, this.loadData);
+	}
+
     render() {
-        const { sortBy, data, period } = this.state;
+        const { data, period, start, end } = this.state;
         return (
         	<View>
 				{this.state.error ? <View style={styles.errorView}><Text style={styles.errorText}>Network error. Could not load leaderboard.</Text></View> : null}
-				<ScrollView style={styles.container} vertical={true}  refreshControl={<RefreshControl
+				<ScrollView contentContainerStyle={styles.container} vertical={true}  refreshControl={<RefreshControl
 					refreshing={this.state.refreshing}
 					onRefresh={this.refreshData}
 				/>}>
-					<Text style={{ marginTop: 20}}>
+					<View style={{flexDirection: 'row'}}>
 						<Text style={{ fontWeight: 'bold'}}>Show &nbsp;</Text>
-						<Text onPress={this.handlePeriodChange('last-week')} style={{color: '#888', fontWeight: period === 'last-week' ? 'bold' : 'normal'}}>last week</Text>
-						&nbsp;
-						<Text onPress={this.handlePeriodChange('last-month')} style={{color: '#888', fontWeight: period === 'last-month' ? 'bold' : 'normal'}}>last month</Text>
-					</Text>
-					<View style={styles.tableWrap}>
-						<View style={styles.head}>
-							<View style={{...styles.headerCell, flex: 1.25}}><Text style={styles.headerText}>#</Text></View>
-							<View style={{...styles.headerCell, flex: 4}}><Text style={styles.headerText}>Athlete</Text></View>
-							<View style={{...styles.headerCell, flex: 2}}><Text style={styles.headerText} onPress={this.handleSort('total')}>Total</Text></View>
-							<View style={{...styles.headerCell, flex: 2}}><Text style={styles.headerText} onPress={this.handleSort('max')}>Max</Text></View>
-						</View>
-						{data.map((u, index) => (
-							<View key={index} style={styles.row}>
-								<View style={{...styles.rowCell,  flex: 1.25}}><Text style={styles.text}>{index+1}</Text></View>
-								<View style={{...styles.rowCell, flex: 4}}><Text style={styles.linkText} onPress={() => this.props.navigation.push('Profile', { id: u.id })}>{u.username}</Text></View>
-								<View style={{...styles.rowCell, flex: 2}}><Text style={styles.text}>{u.total}</Text></View>
-								<View style={{...styles.rowCell, flex: 2}}><Text style={styles.text}>{u.max}</Text></View>
-							</View>
-						))}
+						<Text onPress={this.handlePeriodChange('last-week')} style={{color: '#888', fontWeight: period === 'last-week' ? 'bold' : 'normal'}}>per week</Text>
+						<Text> &nbsp; </Text>
+						<Text onPress={this.handlePeriodChange('last-month')} style={{color: '#888', fontWeight: period === 'last-month' ? 'bold' : 'normal'}}>per month</Text>
 					</View>
+					<View style={{ marginTop: 12 }}>
+						<Text style={{fontStyle: 'italic'}}>Showing {formatDate(start, false)} - {formatDate(end, true)}</Text>
+					</View>
+					<GestureRecognizer
+						onSwipeLeft={(state) => this.onSwipeLeft(state)}
+						onSwipeRight={(state) => this.onSwipeRight(state)}>
+						<View style={styles.tableWrap}>
+							<View style={styles.head}>
+								<View style={{...styles.headerCell, flex: 1.25}}><Text style={styles.headerText}>#</Text></View>
+								<View style={{...styles.headerCell, flex: 4}}><Text style={styles.headerText}>Athlete</Text></View>
+								<View style={{...styles.headerCell, flex: 2}}><Text style={styles.headerText} onPress={this.handleSort('total')}>Total</Text></View>
+								<View style={{...styles.headerCell, flex: 2}}><Text style={styles.headerText} onPress={this.handleSort('max')}>Max</Text></View>
+							</View>
+							{data.map((u, index) => (
+								<View key={index} style={styles.row}>
+									<View style={{...styles.rowCell,  flex: 1.25}}><Text style={styles.text}>{index+1}</Text></View>
+									<View style={{...styles.rowCell, flex: 4}}><Text style={styles.linkText} onPress={() => this.props.navigation.push('Profile', { id: u.id })}>{u.username}</Text></View>
+									<View style={{...styles.rowCell, flex: 2}}><Text style={styles.text}>{u.total}</Text></View>
+									<View style={{...styles.rowCell, flex: 2}}><Text style={styles.text}>{u.max}</Text></View>
+								</View>
+							))}
+						</View>
+					</GestureRecognizer>
 				</ScrollView>
 			</View>
         )
