@@ -34,7 +34,9 @@ export default class Feed extends React.Component {
         } else {
             d.setDate(1);
         }
-        api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(d.getTime()/1000)}`)
+        let now = new Date();
+        now.setHours(23, 59,59);
+        api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(d.getTime()/1000)}&before=${Math.round(now.getTime()/1000)}`)
             .then(data => this.setState({data, sortBy}))
             .catch(error => this.setState({error}))
     }

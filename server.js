@@ -26,10 +26,6 @@ app.use(session({
     saveUninitialized: true,
 }));
 
-if (process.env.NODE_ENV !== 'production') {
-    app.use(morgan('dev'));
-}
-
 const catcher = fn => (req, res, next) => {
     Promise.resolve(fn(req, res, next))
         .catch(err => next(err));
@@ -51,7 +47,11 @@ app.use(function(req, res, next) {
 });
 
 if (!debug) {
+    // static files (otherwise served by livereload)
     app.use(express.static(path.join(__dirname, 'web/build')))
+} else {
+    // convenient request logger
+    app.use(morgan('dev'));
 }
 
 app.get('/api/session', (req, res) => {
@@ -160,7 +160,7 @@ app.get('/api/leaderboard', catcher(async (req, res) => {
     const db = await dbPromise;
     let sortBy = req.query.sortBy === 'max' ? 'max' : 'total';
     let start = parseInt(req.query.after);
-    let end = parseInt(req.query.before) || +new Date();
+    let end = parseInt(req.query.before || +new Date());
     let data = await db.all(`SELECT u.id, u.username, SUM(a.repetitions) AS total, ROUND(AVG(a.repetitions)) AS average, MAX(a.repetitions) AS max FROM users u LEFT JOIN activities a ON a.user_id = u.id AND a.timestamp > datetime(?, 'unixepoch') AND a.timestamp < datetime(?, 'unixepoch') GROUP BY u.id ORDER BY ${sortBy} DESC`, [start, end])
     res.json(data);
 }));
