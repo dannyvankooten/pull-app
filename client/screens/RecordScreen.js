@@ -30,10 +30,9 @@ export default class RecordScreen extends React.Component {
 	};
 
     componentDidMount() {
-    	const user = this.user = auth.getUser();
     	this.setState({error: null});
-
-    	api.get(`/activities?user_id=${user.id}&limit=10`)
+		const user = auth.getUser();
+		api.get(`/activities?user_id=${user.id}&limit=10`)
 			.then((activities) => {
 				activities = activities.map(a => {
 					a.date = api.date(a.timestamp);
@@ -51,10 +50,11 @@ export default class RecordScreen extends React.Component {
             loading: true,
         });
 
+		const user = auth.getUser();
         AsyncStorage.setItem("reps", String(this.state.reps));
 
         api.post('/activities', {
-        	user_id: this.user.id,
+        	user_id: user.id,
             repetitions: this.state.reps
         }).then((activity) => {
             activity.date = api.date(activity.timestamp);

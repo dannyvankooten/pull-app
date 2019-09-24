@@ -9,6 +9,7 @@
     "connect-sqlite3": "^0.9.11",
     "express": "4.13.3",
     "express-session": "^1.16.2",
+    "morgan": "^1.9.1",
     "randomstring": "^1.1.5",
     "sqlite": "^3.0.3"
   },

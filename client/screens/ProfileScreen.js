@@ -175,6 +175,8 @@ export default class ProfileScreen extends React.Component{
 						<Table title="This year" data={data} altData={altData} period={"this-year"} userName={user.username}/>
 						<Table title="All-time" data={data} altData={altData}  period={"all-time"} userName={user.username} />
 					</View>
+
+					{__DEV__ && <Text style={{ marginTop: 20}} onPress={() => {auth.setUser(''); auth.setToken(''); this.props.navigation.navigate("Auth"); }}>Log out</Text>}
             	</ScrollView>
 			</View>
         )
