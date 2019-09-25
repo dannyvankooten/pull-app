@@ -21,12 +21,12 @@ export default function Chart(props) {
             iStart.setHours(0, 0, 0);
 
             if (per === 'day') {
-				iStart.setDate(now.getDate() + (8 - iStart.getDay()) + (props.dateOffset * numberOfBars) - i);
+				iStart.setDate(now.getDate() + (props.dateOffset * numberOfBars) - i + 1);
             } else if (per === 'week') {
-				iStart.setDate(now.getDate() + (8 - iStart.getDay()) + (props.dateOffset * 7 * numberOfBars) - i * 7);
+				iStart.setDate(now.getDate() + (8 - now.getDay()) + (props.dateOffset * 7 * numberOfBars) - i * 7);
 			} else if (per === 'month') {
 				iStart.setDate(1);
-				iStart.setMonth(now.getMonth() + ( props.dateOffset * numberOfBars ) - i);
+				iStart.setMonth(now.getMonth() + ( props.dateOffset * numberOfBars ) - i + 1);
             }
 
             let iEnd = new Date(iStart);
