@@ -30,10 +30,11 @@ export default class Feed extends React.Component {
         let d = new Date();
         d.setHours(0, 0, 0);
         if (period === 'week') {
-            d.setDate(d.getDate() - d.getDay());
+            d.setDate(d.getDate() - d.getDay() + 1); // set to Monday
         } else {
             d.setDate(1);
         }
+
         let now = new Date();
         now.setHours(23, 59,59);
         api.get(`/leaderboard?limit=20&sortBy=${sortBy}&after=${Math.round(d.getTime()/1000)}&before=${Math.round(now.getTime()/1000)}`)
