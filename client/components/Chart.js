@@ -13,28 +13,28 @@ export default function Chart(props) {
         let now = new Date();
         let rawData = props.data;
         let barData = [];
-        const period = props.period || 'week';
-        const numberOfBars = {week: 7, month: 5, year: 12}[period];
+        const per = props.groupBy || 'week';
+        const numberOfBars = 12;
 
         for(let i = numberOfBars; i > 0; i--) {
             let iStart = new Date();
             iStart.setHours(0, 0, 0);
 
-            if (period === 'week') {
-				iStart.setDate(now.getDate() + (8 - iStart.getDay()) + (props.periodAgo * 7) - i);
-            } else if (period === 'month') {
-				iStart.setDate(now.getDate() + (8 - iStart.getDay()) + (props.periodAgo * 7 * 5) - i * 7);
-			} else if (period === 'year') {
+            if (per === 'day') {
+				iStart.setDate(now.getDate() + (8 - iStart.getDay()) + (props.dateOffset * numberOfBars) - i);
+            } else if (per === 'week') {
+				iStart.setDate(now.getDate() + (8 - iStart.getDay()) + (props.dateOffset * 7 * numberOfBars) - i * 7);
+			} else if (per === 'month') {
 				iStart.setDate(1);
-				iStart.setMonth(now.getMonth() + (12 - now.getMonth()) + ( props.periodAgo * 12 ) - i);
+				iStart.setMonth(now.getMonth() + ( props.dateOffset * numberOfBars ) - i);
             }
 
             let iEnd = new Date(iStart);
-            if (period === 'week') {
+            if (per === 'day') {
 				iEnd.setDate(iStart.getDate() + 1);
-			} else if(period === 'month') {
+			} else if(per === 'week') {
             	iEnd.setDate(iStart.getDate() + 7);
-            } else if(period === 'year') {
+            } else if(per === 'month') {
 				iEnd.setMonth(iStart.getMonth() + 1);
             }
 
@@ -54,17 +54,40 @@ export default function Chart(props) {
         const endDate = barData[barData.length-1].x;
 
         const tickFormatters = {
-        	week: d => days[d.getDay()],
-			month: d => '',
-			year: d => monthNames[d.getMonth()],
-		};
+        	day: (d, i) => {
+                if (i % 3 !== 0 && i !== numberOfBars-1) {
+                    return '';
+                }
 
-        let subtitle;
-        if (period === 'week') {
-			subtitle = `${monthNames[startDate.getMonth()]} ${startDate.getDate()} - ${monthNames[endDate.getMonth()]} ${endDate.getDate()}`
-		} else {
-			subtitle = `${monthNames[startDate.getMonth()]} ${startDate.getDate()} - ${monthNames[endDate.getMonth()]} ${endDate.getDate()}, ${startDate.getFullYear()}`
-		}
+                if (i === 0) {
+                    return monthNames[d.getMonth()] + " " + d.getDate() + "\n" + d.getFullYear();;
+                }
+
+                return monthNames[d.getMonth()] + " " + d.getDate();
+            },
+			week: (d, i) => {
+                if (i % 4 !== 0) {
+                    return '';
+                }
+
+                if (i === 0 || i === numberOfBars-1) {
+                    return monthNames[d.getMonth()] + "\n" + d.getFullYear();
+                }
+
+                return monthNames[d.getMonth()];
+            },
+			month: (d, i) => {
+                if (i % 3 !== 0 && i !== numberOfBars-1) {
+                    return '';
+                }
+
+                if (i === 0 || i === numberOfBars-1) {
+                    return monthNames[d.getMonth()] + "\n" + d.getFullYear();
+                }
+
+                return monthNames[d.getMonth()];
+            },
+		};
 
         return (
             <View>
@@ -75,12 +98,11 @@ export default function Chart(props) {
                         onLoad: { duration: 200 }
                     }}
                     height={200}
-                    padding={{ top: 20, bottom: 40, left: 0, right: 40 }}
+                    padding={{ top: 20, bottom: 40, left: 10, right: 40 }}
                     domainPadding={10}>
-                    <VictoryAxis tickValues={barData.map(v => v.x)} tickFormat={tickFormatters[period]} />
-                    <VictoryBar data={barData} labels={({ datum }) => datum.y > 0 ? String(Math.round(datum.y)) : ''} />
+                    <VictoryAxis tickValues={barData.map(v => v.x)} tickFormat={tickFormatters[per]} />
+                    <VictoryBar data={barData} labels={({ datum }) => datum.y > 0 ? String(Math.round(datum.y)) : ''} barRatio={1} />
                 </VictoryChart>
-				<Text style={styles.muted}>{subtitle}</Text>
             </View>
         )
 }

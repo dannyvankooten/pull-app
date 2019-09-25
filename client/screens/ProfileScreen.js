@@ -4,7 +4,8 @@ import {
     StyleSheet,
     Text,
     View,
-	RefreshControl
+	RefreshControl,
+	TouchableOpacity
 } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import api from './../util/api.js';
@@ -92,12 +93,14 @@ export default class ProfileScreen extends React.Component{
 			error: null,
 
 			user: {},
-			chartPeriod: 'week',
-			chartPeriodAgo: 0,
+			chartGroupBy: 'week',
+			chartDateOffset: 0,
 
 			data: [],
 			altData: []
-		}
+		};
+
+		this.loadData = this.loadData.bind(this);
     };
 
     componentDidMount() {
@@ -128,30 +131,30 @@ export default class ProfileScreen extends React.Component{
 			.catch(error => this.setState({error}))
             .then(d => this.setState(d));
 
-        api.get(`/v1/stats/${id}`)
-            .then(data => this.setState({data: initDates(data)}))
-			.catch(error => this.setState({error}))
-			.finally(() => this.setState({ loading: false }));
-
-        if (user && id !== user.id) {
+		if (user && id !== user.id) {
 			api.get(`/v1/stats/${user.id}`)
 				.catch(error => null)
 				.then(altData => this.setState({altData: initDates(altData)}))
 		}
+
+        return api.get(`/v1/stats/${id}`)
+            .then(data => this.setState({data: initDates(data)}))
+			.catch(error => this.setState({error}))
+			.finally(() => this.setState({ loading: false }));
     }
 
 	onSwipeLeft(gestureState) {
-		const chartPeriodAgo = Math.min(0, ++this.state.chartPeriodAgo);
-		this.setState({chartPeriodAgo});
+		const chartDateOffset = Math.min(0, ++this.state.chartDateOffset);
+		this.setState({chartDateOffset});
 	}
 
 	onSwipeRight(gestureState) {
-		const chartPeriodAgo = --this.state.chartPeriodAgo;
-		this.setState({chartPeriodAgo});
+		const chartDateOffset = --this.state.chartDateOffset;
+		this.setState({chartDateOffset});
 	}
 
     render() {
-    	const { chartPeriod, chartPeriodAgo, refreshing, user, data, altData } = this.state;
+    	const { chartDateOffset, chartGroupBy, refreshing, user, data, altData } = this.state;
 
         return (
         	<View>
@@ -162,11 +165,11 @@ export default class ProfileScreen extends React.Component{
 						<GestureRecognizer
 							onSwipeLeft={(state) => this.onSwipeLeft(state)}
 							onSwipeRight={(state) => this.onSwipeRight(state)}>
-							<Chart data={data} period={chartPeriod} periodAgo={chartPeriodAgo} />
-							<View style={styles.chartPeriods}>
-								<Text style={chartPeriod === 'week' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'week'})}>Week</Text>
-								{/*<Text style={chartPeriod === 'month' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'month'})}>Month</Text> */}
-								<Text style={chartPeriod === 'year' ? styles.chartPeriodActive : styles.chartPeriod} onPress={() => this.setState({chartPeriod: 'year'})}>Year</Text>
+							<Chart data={data} groupBy={chartGroupBy} dateOffset={chartDateOffset} />
+							<View style={styles.chartGroupByContainer}>
+								<TouchableOpacity style={chartGroupBy === 'day' ? styles.chartGroupbyChoiceActive : styles.chartGroupByChoice} onPress={() => this.setState({chartGroupBy: 'day'})}><Text style={styles.chartGroupByChoiceText}>Daily</Text></TouchableOpacity>
+								<TouchableOpacity style={chartGroupBy === 'week' ? styles.chartGroupbyChoiceActive : styles.chartGroupByChoice} onPress={() => this.setState({chartGroupBy: 'week'})}><Text style={styles.chartGroupByChoiceText}>Weekly</Text></TouchableOpacity>
+								<TouchableOpacity style={chartGroupBy === 'month' ? styles.chartGroupbyChoiceActive : styles.chartGroupByChoice} onPress={() => this.setState({chartGroupBy: 'month'})}><Text style={styles.chartGroupByChoiceText}>Monthly</Text></TouchableOpacity>
 							</View>
 						</GestureRecognizer>
 					</View>
@@ -203,19 +206,23 @@ const styles = StyleSheet.create({
 	},
 	rowTitleText: { flex: 6},
 	rowValueText: { flex: 3},
-	chartPeriods: {
+	chartGroupByContainer: {
 		marginTop: 10,
 		textAlign: 'center',
-		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
+		flexDirection: 'row',
 		flex: 1,
 	},
-	chartPeriod: {
+	chartGroupByChoice: {
+		paddingVertical: 4,
+		paddingHorizontal: 8,
+		borderColor: "#EEE",
+		borderWidth: 1,
+	},
+	chartGroupByChoiceText: {
 		color: '#AAA',
 		fontSize: 12,
-		marginRight: 4,
-		padding: 2,
 	},
 	errorView: {
 		margin: 12,
@@ -234,7 +241,7 @@ styles.rowOdd = {
 	...styles.row,
 	backgroundColor: 'rgba(0,0,0,.02)',
 };
-styles.chartPeriodActive = {
-	...styles.chartPeriod,
-	textDecorationLine: 'underline',
+styles.chartGroupbyChoiceActive = {
+	...styles.chartGroupByChoice,
+	backgroundColor: 'rgba(0,0,0,.05)',
 };
